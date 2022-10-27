@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "6InZuNxRSPOhmyeBnC7oW44w4wTiJaxIJ4hw7PQbE51G+TljBnc2ZUErUJYto9hBl6xjdqvNk5W/868nqEsXQA==",
+  "dgSpecHash": "yRERACwY+dAVvI9VJAiMpeD65QdRDXtI/W37tOjqN636TL1pOTki/hmQjigF1/chyz7SP0Tw1738pXwMWFw7jA==",
   "success": true,
-  "projectFilePath": "/media/manh/DATA/workspace/mobifone/XHTDHP/xhtdApi/xhtdApi.csproj",
+  "projectFilePath": "/media/manh/DATA/workspace/mobifone/vc_hp_xhtd_api/xhtdApi/xhtdApi.csproj",
   "expectedPackageFiles": [
     "/home/manh/.nuget/packages/elasticsearch.net/7.17.5/elasticsearch.net.7.17.5.nupkg.sha512",
     "/home/manh/.nuget/packages/entityframework/6.4.4/entityframework.6.4.4.nupkg.sha512",

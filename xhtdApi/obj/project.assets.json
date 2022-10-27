@@ -6258,11 +6258,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/media/manh/DATA/workspace/mobifone/XHTDHP/xhtdApi/xhtdApi.csproj",
+      "projectUniqueName": "/media/manh/DATA/workspace/mobifone/vc_hp_xhtd_api/xhtdApi/xhtdApi.csproj",
       "projectName": "xhtdApi",
-      "projectPath": "/media/manh/DATA/workspace/mobifone/XHTDHP/xhtdApi/xhtdApi.csproj",
+      "projectPath": "/media/manh/DATA/workspace/mobifone/vc_hp_xhtd_api/xhtdApi/xhtdApi.csproj",
       "packagesPath": "/home/manh/.nuget/packages/",
-      "outputPath": "/media/manh/DATA/workspace/mobifone/XHTDHP/xhtdApi/obj/",
+      "outputPath": "/media/manh/DATA/workspace/mobifone/vc_hp_xhtd_api/xhtdApi/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/manh/.nuget/NuGet/NuGet.Config"
