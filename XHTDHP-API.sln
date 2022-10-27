@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31019.35
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XHTDHP-API", "XHTDHP-API\XHTDHP-API.csproj", "{CBF42942-1188-4D0F-AE74-E93C0DC5BB6D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CBF42942-1188-4D0F-AE74-E93C0DC5BB6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBF42942-1188-4D0F-AE74-E93C0DC5BB6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBF42942-1188-4D0F-AE74-E93C0DC5BB6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBF42942-1188-4D0F-AE74-E93C0DC5BB6D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C6232745-6294-4DA6-A0FF-1129F0060226}
+	EndGlobalSection
+EndGlobal
