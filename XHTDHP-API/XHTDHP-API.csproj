@@ -34,6 +34,7 @@
     <PackageReference Include="NLog" Version="5.0.5" />
     <PackageReference Include="Oracle.ManagedDataAccess" Version="21.8.0" />
     <PackageReference Include="RestSharp" Version="108.0.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.24.0" />
   </ItemGroup>

@@ -14,5 +14,6 @@ namespace XHTDHP_API.Data
         }
 
         public DbSet<Driver> Drivers { get; set; }
+        public DbSet<Vehicle> Vehicles { get; set; }
     }
 }

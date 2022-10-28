@@ -81,14 +81,5 @@ namespace XHTDHP_API.Controllers
                 return BadRequest(new { succeeded = false, message = "Có lỗi xảy ra" });
             }
         }
-
-        private static DriverDTO ItemToDTO(Driver driver) =>
-            new DriverDTO
-            {
-                Id = driver.Id,
-                FullName = driver.FullName,
-                Email = driver.Email,
-                Phone = driver.Phone,
-            };
     }
 }

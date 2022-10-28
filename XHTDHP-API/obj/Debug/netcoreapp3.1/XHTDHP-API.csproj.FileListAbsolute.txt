@@ -313,3 +313,8 @@ D:/Projects/VICEM/HAIPHONG/XHTD/Api/XHTDHP-API/bin/Debug/netcoreapp3.1/log4net.d
 /media/manh/DATA/workspace/mobifone/vc_hp_xhtd_api/XHTDHP-API/bin/Debug/netcoreapp3.1/Humanizer.dll
 /media/manh/DATA/workspace/mobifone/vc_hp_xhtd_api/XHTDHP-API/bin/Debug/netcoreapp3.1/AutoMapper.dll
 /media/manh/DATA/workspace/mobifone/vc_hp_xhtd_api/XHTDHP-API/bin/Debug/netcoreapp3.1/AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+/media/manh/DATA/workspace/mobifone/vc_hp_xhtd_api/XHTDHP-API/bin/Debug/netcoreapp3.1/Microsoft.OpenApi.dll
+/media/manh/DATA/workspace/mobifone/vc_hp_xhtd_api/XHTDHP-API/bin/Debug/netcoreapp3.1/Swashbuckle.AspNetCore.Swagger.dll
+/media/manh/DATA/workspace/mobifone/vc_hp_xhtd_api/XHTDHP-API/bin/Debug/netcoreapp3.1/Swashbuckle.AspNetCore.SwaggerGen.dll
+/media/manh/DATA/workspace/mobifone/vc_hp_xhtd_api/XHTDHP-API/bin/Debug/netcoreapp3.1/Swashbuckle.AspNetCore.SwaggerUI.dll
+/media/manh/DATA/workspace/mobifone/vc_hp_xhtd_api/XHTDHP-API/obj/Debug/netcoreapp3.1/XHTDHP-API.MvcApplicationPartsAssemblyInfo.cs
