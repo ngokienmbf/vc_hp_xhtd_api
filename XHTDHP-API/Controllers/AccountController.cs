@@ -20,6 +20,7 @@ using XHTDHP_API.Logging;
 
 namespace XHTDHP_API.Controllers
 {
+    [Route("[controller]/[action]")]
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = false)]
     public class AccountController : ControllerBase
@@ -36,8 +37,7 @@ namespace XHTDHP_API.Controllers
 
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
-        [Route("/token")]
-        public async Task<ActionResult<Object>> token([FromForm] LoginDto model)
+        public async Task<ActionResult<Object>> Login([FromBody] LoginDto model)
         {
             var responseModel = new SumProfileResponseDTO();
             if (String.IsNullOrEmpty(model.username) || String.IsNullOrEmpty(model.password))
