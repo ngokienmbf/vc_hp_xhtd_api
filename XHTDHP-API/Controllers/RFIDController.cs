@@ -1,29 +1,24 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using XHTDHP_API.Data;
 using XHTDHP_API.Entities;
 using XHTDHP_API.Helpers;
-using XHTDHP_API.Models;
 using XHTDHP_API.Models.Filter;
 
 namespace XHTDHP_API.Controllers
 {
+    [ApiController]
     [Route("api/[controller]")]
-    public class DriverController : ControllerBase
+    public class RFIDController : ControllerBase
     {
-        private readonly ILogger<DriverController> _logger;
         private readonly ApiDbContext _context;
 
-        public DriverController(ILogger<DriverController> logger, ApiDbContext context)
+        public RFIDController(ApiDbContext context)
         {
-            _logger = logger;
             _context = context;
         }
 
@@ -31,36 +26,36 @@ namespace XHTDHP_API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] PaginationFilter filter)
         {
-            var query = _context.Drivers.OrderBy(item => item.Id).AsNoTracking();
+            var query = _context.RFIDs.OrderBy(item => item.Id).AsNoTracking();
             if (!String.IsNullOrEmpty(filter.SeachKey))
             {
-                query = query.Where(item => item.FullName.Contains(filter.SeachKey));
+                query = query.Where(item => item.Code.Contains(filter.SeachKey));
             }
             var totalRecords = await query.CountAsync();
             query = query.Skip((filter.PageNumber - 1) * filter.PageSize).Take(filter.PageSize);
             var pagedData = await query.ToListAsync();
-            var pagedReponse = PaginationHelper.CreatePagedReponse<Driver>(pagedData, filter, totalRecords);
+            var pagedReponse = PaginationHelper.CreatePagedReponse<RFID>(pagedData, filter, totalRecords);
             return Ok(pagedReponse);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByID(int id)
         {
-            var driver = await _context.Drivers.FindAsync(id);
-            return Ok(new { succeeded = true, message = "Lấy dữ liệu thành công", data = driver });
+            var found = await _context.RFIDs.FindAsync(id);
+            return Ok(new { succeeded = true, message = "Lấy dữ liệu thành công", data = found });
         }
 
         [HttpPost]
-        public async Task<IActionResult> Insert([FromBody] Driver model)
+        public async Task<IActionResult> Inser([FromBody] RFID model)
         {
             model.CreatedOn = DateTime.Now;
-            _context.Drivers.Add(model);
+            _context.RFIDs.Add(model);
             await _context.SaveChangesAsync();
             return Ok(new { succeeded = true, message = "Thêm thành công" });
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] Driver model)
+        public async Task<IActionResult> Update([FromBody] RFID model)
         {
             model.ModifiedOn = DateTime.Now;
             _context.Entry(model).State = EntityState.Modified;
@@ -71,10 +66,10 @@ namespace XHTDHP_API.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var driver = _context.Drivers.Find(id);
-            if (driver != null)
+            var found = _context.RFIDs.Find(id);
+            if (found != null)
             {
-                _context.Entry(driver).State = EntityState.Deleted;
+                _context.Entry(found).State = EntityState.Deleted;
                 _context.SaveChanges();
                 return Ok(new { succeeded = true, message = "Xoá thành công" });
             }
