@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -7,6 +8,7 @@ namespace XHTDHP_API.Entities
 {
     public class Vehicle : BaseClass
     {
+        [Key]
         public int Id { get; set; }
         public string NameDriver { get; set; }
         public string LicensePlace { get; set; }
