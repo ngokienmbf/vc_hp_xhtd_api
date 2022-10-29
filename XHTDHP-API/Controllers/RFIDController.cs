@@ -26,7 +26,7 @@ namespace XHTDHP_API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] PaginationFilter filter)
         {
-            var query = _context.RFIDs.OrderBy(item => item.Id).AsNoTracking();
+            var query = _context.tblRFID.OrderBy(item => item.Id).AsNoTracking();
             if (!String.IsNullOrEmpty(filter.SeachKey))
             {
                 query = query.Where(item => item.Code.Contains(filter.SeachKey));
@@ -34,30 +34,30 @@ namespace XHTDHP_API.Controllers
             var totalRecords = await query.CountAsync();
             query = query.Skip((filter.PageNumber - 1) * filter.PageSize).Take(filter.PageSize);
             var pagedData = await query.ToListAsync();
-            var pagedReponse = PaginationHelper.CreatePagedReponse<RFID>(pagedData, filter, totalRecords);
+            var pagedReponse = PaginationHelper.CreatePagedReponse<tblRFID>(pagedData, filter, totalRecords);
             return Ok(pagedReponse);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByID(int id)
         {
-            var found = await _context.RFIDs.FindAsync(id);
+            var found = await _context.tblRFID.FindAsync(id);
             return Ok(new { succeeded = true, message = "Lấy dữ liệu thành công", data = found });
         }
 
         [HttpPost]
-        public async Task<IActionResult> Inser([FromBody] RFID model)
+        public async Task<IActionResult> Insert([FromBody] tblRFID model)
         {
-            model.CreatedOn = DateTime.Now;
-            _context.RFIDs.Add(model);
+            model.CreatedDay = DateTime.Now;
+            _context.tblRFID.Add(model);
             await _context.SaveChangesAsync();
             return Ok(new { succeeded = true, message = "Thêm thành công" });
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] RFID model)
+        public async Task<IActionResult> Update([FromBody] tblRFID model)
         {
-            model.ModifiedOn = DateTime.Now;
+            model.UpdateDay = DateTime.Now;
             _context.Entry(model).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return Ok(new { succeeded = true, message = "Cập nhật thành công", data = model });
@@ -66,7 +66,7 @@ namespace XHTDHP_API.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var found = _context.RFIDs.Find(id);
+            var found = _context.tblRFID.Find(id);
             if (found != null)
             {
                 _context.Entry(found).State = EntityState.Deleted;

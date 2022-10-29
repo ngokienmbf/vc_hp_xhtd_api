@@ -30,38 +30,38 @@ namespace XHTDHP_API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] PaginationFilter filter)
         {
-            var query = _context.Vehicles.OrderBy(item => item.Id).AsNoTracking();
+            var query = _context.tblVehicle.OrderBy(item => item.IDVehicle).AsNoTracking();
             if (!String.IsNullOrEmpty(filter.SeachKey))
             {
-                query = query.Where(item => item.LicensePlace.Contains(filter.SeachKey));
+                query = query.Where(item => item.Vehicle.Contains(filter.SeachKey));
             }
             var totalRecords = await query.CountAsync();
             query = query.Skip((filter.PageNumber - 1) * filter.PageSize).Take(filter.PageSize);
             var pagedData = await query.ToListAsync();
-            var pagedReponse = PaginationHelper.CreatePagedReponse<Vehicle>(pagedData, filter, totalRecords);
+            var pagedReponse = PaginationHelper.CreatePagedReponse<tblVehicle>(pagedData, filter, totalRecords);
             return Ok(pagedReponse);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByID(int id)
         {
-            var found = await _context.Vehicles.FindAsync(id);
+            var found = await _context.tblVehicle.FindAsync(id);
             return Ok(new { succeeded = true, message = "Lấy dữ liệu thành công", data = found });
         }
 
         [HttpPost]
-        public async Task<IActionResult> Inser([FromBody] Vehicle model)
+        public async Task<IActionResult> Inser([FromBody] tblVehicle model)
         {
-            model.CreatedOn = DateTime.Now;
-            _context.Vehicles.Add(model);
+            model.CreateDay = DateTime.Now;
+            _context.tblVehicle.Add(model);
             await _context.SaveChangesAsync();
             return Ok(new { succeeded = true, message = "Thêm thành công" });
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] Vehicle model)
+        public async Task<IActionResult> Update([FromBody] tblVehicle model)
         {
-            model.ModifiedOn = DateTime.Now;
+            model.UpdateDay = DateTime.Now;
             _context.Entry(model).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return Ok(new { succeeded = true, message = "Cập nhật thành công", data = model });
@@ -70,7 +70,7 @@ namespace XHTDHP_API.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var found = _context.Vehicles.Find(id);
+            var found = _context.tblVehicle.Find(id);
             if (found != null)
             {
                 _context.Entry(found).State = EntityState.Deleted;
