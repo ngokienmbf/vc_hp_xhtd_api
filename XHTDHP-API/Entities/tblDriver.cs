@@ -25,7 +25,7 @@ namespace XHTDHP_API.Entities
         public string Address { get; set; }
         [MaxLength(50)]
         public string UserName { get; set; }
-        public bool State { get; set; }
+        public bool State { get; set; } = true;
         public DateTime CreateDay { get; set; }
         public string CreateBy { get; set; }
         public DateTime UpdateDay { get; set; }

@@ -55,6 +55,16 @@ namespace XHTDHP_API.Controllers
         {
             _context.tblDriver.Add(model);
             await _context.SaveChangesAsync();
+            var newAccount = new tblAccount 
+            {
+                UserName = model.UserName,
+                Password = RandomNumber(),
+                GroupId = 1,
+                State = true,
+                CreateDay = DateTime.Now
+            };
+            await _context.tblAccount.AddAsync(newAccount);
+            await _context.SaveChangesAsync();
             return Ok(new { succeeded = true, message = "Thêm thành công" });
         }
 
@@ -80,6 +90,13 @@ namespace XHTDHP_API.Controllers
             {
                 return BadRequest(new { succeeded = false, message = "Có lỗi xảy ra" });
             }
+        }
+
+        private static string RandomNumber()
+        {
+            Random rnd = new Random();
+            var result = rnd.Next(0, 1000000).ToString("D6");
+            return result;
         }
     }
 }
