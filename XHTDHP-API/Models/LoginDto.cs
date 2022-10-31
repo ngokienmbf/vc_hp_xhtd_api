@@ -7,6 +7,7 @@ namespace XHTDHP_API.Models
         public string access_token { get; set; }
         public double expires_in { get; set; }
         public string token_type { get; set; }
+        public string errorCode { get; set; }
     }
     public class LoginDto
     {

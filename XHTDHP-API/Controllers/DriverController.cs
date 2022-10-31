@@ -31,7 +31,7 @@ namespace XHTDHP_API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] PaginationFilter filter)
         {
-            var query = _context.Drivers.OrderBy(item => item.Id).AsNoTracking();
+            var query = _context.tblDriver.OrderBy(item => item.Id).AsNoTracking();
             if (!String.IsNullOrEmpty(filter.SeachKey))
             {
                 query = query.Where(item => item.FullName.Contains(filter.SeachKey));
@@ -39,30 +39,28 @@ namespace XHTDHP_API.Controllers
             var totalRecords = await query.CountAsync();
             query = query.Skip((filter.PageNumber - 1) * filter.PageSize).Take(filter.PageSize);
             var pagedData = await query.ToListAsync();
-            var pagedReponse = PaginationHelper.CreatePagedReponse<Driver>(pagedData, filter, totalRecords);
+            var pagedReponse = PaginationHelper.CreatePagedReponse<tblDriver>(pagedData, filter, totalRecords);
             return Ok(pagedReponse);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByID(int id)
         {
-            var driver = await _context.Drivers.FindAsync(id);
+            var driver = await _context.tblDriver.FindAsync(id);
             return Ok(new { succeeded = true, message = "Lấy dữ liệu thành công", data = driver });
         }
 
         [HttpPost]
-        public async Task<IActionResult> Insert([FromBody] Driver model)
+        public async Task<IActionResult> Insert([FromBody] tblDriver model)
         {
-            model.CreatedOn = DateTime.Now;
-            _context.Drivers.Add(model);
+            _context.tblDriver.Add(model);
             await _context.SaveChangesAsync();
             return Ok(new { succeeded = true, message = "Thêm thành công" });
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] Driver model)
+        public async Task<IActionResult> Update([FromBody] tblDriver model)
         {
-            model.ModifiedOn = DateTime.Now;
             _context.Entry(model).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return Ok(new { succeeded = true, message = "Cập nhật thành công", data = model });
@@ -71,7 +69,7 @@ namespace XHTDHP_API.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var driver = _context.Drivers.Find(id);
+            var driver = _context.tblDriver.Find(id);
             if (driver != null)
             {
                 _context.Entry(driver).State = EntityState.Deleted;

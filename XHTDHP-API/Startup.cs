@@ -30,6 +30,17 @@ namespace XHTDHP_API
             services.AddControllers();
             services.AddDbContext<ApiDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("SQLConnOracle")));
             services.AddSwaggerGen();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("ClientPermission", policy =>
+                {
+                    policy.AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .WithOrigins("http://localhost:3000")
+                        .AllowCredentials();
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -42,6 +53,12 @@ namespace XHTDHP_API
                 app.UseSwaggerUI();
             }
 
+            app.UseCors(x => x
+           .AllowAnyMethod()
+           .AllowAnyHeader()
+           .SetIsOriginAllowed(origin => true)
+           .AllowCredentials());
+
             app.UseHttpsRedirection();
 
             app.UseRouting();
@@ -52,6 +69,8 @@ namespace XHTDHP_API
             {
                 endpoints.MapControllers();
             });
+
+                        
         }
     }
 }

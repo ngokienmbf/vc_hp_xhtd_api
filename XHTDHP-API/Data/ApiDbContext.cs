@@ -13,8 +13,8 @@ namespace XHTDHP_API.Data
         {
         }
 
-        public DbSet<Driver> Drivers { get; set; }
-        public DbSet<Vehicle> Vehicles { get; set; }
-        public DbSet<RFID> RFIDs { get; set; }
+        public DbSet<tblDriver> tblDriver { get; set; }
+        public DbSet<tblVehicle> tblVehicle { get; set; }
+        public DbSet<tblRFID> tblRFID { get; set; }
     }
 }

@@ -37,7 +37,7 @@ namespace XHTDHP_API.Controllers
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         [Route("/token")]
-        public async Task<ActionResult<Object>> token([FromForm] LoginDto model)
+        public async Task<ActionResult<Object>> token([FromBody] LoginDto model)
         {
             var responseModel = new SumProfileResponseDTO();
             if (String.IsNullOrEmpty(model.username) || String.IsNullOrEmpty(model.password))
@@ -61,6 +61,7 @@ namespace XHTDHP_API.Controllers
                     responseModel.expires_in = expireIn;
                     responseModel.access_token = jwt.ToString();
                     responseModel.token_type = "bearer";
+                    responseModel.errorCode = "200";
                     return responseModel;
                 }
                 else
