@@ -16,7 +16,7 @@ namespace XHTDHP_API.Entities
         public string Email { get; set; }
         [MaxLength(50)]
         public string Phone { get; set; }
-        public DateTime Birthday { get; set; }
+        public DateTime? Birthday { get; set; }
         [MaxLength(50)]
         public string Gender { get; set; }
         [MaxLength(50)]
@@ -26,9 +26,9 @@ namespace XHTDHP_API.Entities
         [MaxLength(50)]
         public string UserName { get; set; }
         public bool State { get; set; } = true;
-        public DateTime CreateDay { get; set; }
+        public DateTime? CreateDay { get; set; }
         public string CreateBy { get; set; }
-        public DateTime UpdateDay { get; set; }
+        public DateTime? UpdateDay { get; set; }
         public string UpdateBy { get; set; }
     }
 }
