@@ -13,7 +13,7 @@ namespace XHTDHP_API.Models
     {
         public string grant_type { get; set; } = "password";
         [Required]
-        public string username { get; set; }
+        public string userName { get; set; }
         [Required]
         public string password { get; set; }
     }
