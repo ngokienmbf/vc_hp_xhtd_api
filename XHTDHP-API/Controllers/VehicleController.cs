@@ -45,7 +45,11 @@ namespace XHTDHP_API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByID(int id)
         {
-            var found = await _context.tblVehicle.FindAsync(id);
+            var found = await _context.tblVehicle.Where(item => item.IDVehicle == id).FirstOrDefaultAsync();
+            if (found == null)
+            {
+                return BadRequest("Không tìm thấy phương tiện");
+            }
             return Ok(new { succeeded = true, message = "Lấy dữ liệu thành công", data = found });
         }
 
