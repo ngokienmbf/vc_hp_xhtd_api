@@ -50,7 +50,7 @@ namespace XHTDHP_API.Controllers
             {
                 return BadRequest("Không tìm thấy phương tiện");
             }
-            return Ok(new { succeeded = true, message = "Lấy dữ liệu thành công", data = found });
+            return Ok(found);
         }
 
         [HttpPost]
