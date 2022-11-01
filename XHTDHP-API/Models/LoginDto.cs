@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 
 namespace XHTDHP_API.Models
 {
@@ -8,6 +9,7 @@ namespace XHTDHP_API.Models
         public double expires_in { get; set; }
         public string token_type { get; set; }
         public string errorCode { get; set; }
+        public List<string> ListRole { get; set; }
     }
     public class LoginDto
     {

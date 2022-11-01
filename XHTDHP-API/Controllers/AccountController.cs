@@ -40,6 +40,12 @@ namespace XHTDHP_API.Controllers
         public async Task<ActionResult<Object>> Login([FromBody] LoginDto model)
         {
             var responseModel = new SumProfileResponseDTO();
+            responseModel.ListRole = new List<string>();
+            
+            //TODO: remove sau khi done phần qly tài khoản
+            responseModel.ListRole.Add("Admin");
+            responseModel.ListRole.Add("ds");
+            
             if (String.IsNullOrEmpty(model.userName) || String.IsNullOrEmpty(model.password))
             {
                 return responseModel;
@@ -48,14 +54,18 @@ namespace XHTDHP_API.Controllers
             {
                 var checkUserNameAndPass = objFunction.checkUserNameAndPassWord(model.userName, model.password);
                 if (!checkUserNameAndPass) return responseModel;
+                
                 var user = new AppUser
                 {
                     UserName = model.userName,
                     NormalizedUserName = model.userName,
                     PasswordHash = model.password
                 };
+
                 if (user != null)
                 {
+                    // var lstRole = await _userManager.GetRolesAsync(user);
+                    // responseModel.ListRole = _mapper.Map<List<string>>(lstRole);
                     var jwt = await GenerateJwtToken(user);
                     var expireIn = Convert.ToDouble(3600);
                     responseModel.expires_in = expireIn;
@@ -63,9 +73,7 @@ namespace XHTDHP_API.Controllers
                     responseModel.token_type = "bearer";
                     responseModel.errorCode = "200";
                     return responseModel;
-                }
-                else
-                {
+                } else {
                     return responseModel;
                 }
             }

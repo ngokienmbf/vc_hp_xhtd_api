@@ -42,7 +42,7 @@ namespace XHTDHP_API.Controllers
         public async Task<IActionResult> GetByID(int id)
         {
             var found = await _context.tblRFID.FindAsync(id);
-            return Ok(new { succeeded = true, message = "Lấy dữ liệu thành công", data = found });
+            return Ok(found);
         }
 
         [HttpPost]
