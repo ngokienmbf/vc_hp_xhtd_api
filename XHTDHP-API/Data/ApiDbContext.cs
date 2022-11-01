@@ -18,5 +18,6 @@ namespace XHTDHP_API.Data
         public DbSet<tblRFID> tblRFID { get; set; }
         public DbSet<tblAccount> tblAccount { get; set; }
         public DbSet<tblStoreOrderOperating> tblStoreOrderOperating { get; set; }
+        public DbSet<tblDriverVehicle> tblDriverVehicle { get; set; }
     }
 }
