@@ -19,6 +19,10 @@ using System.Collections.Generic;
 using XHTDHP_API.Logging;
 using XHTDHP_API.Entities;
 using XHTDHP_API.Data;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
 namespace XHTDHP_API.Controllers
 {
@@ -60,6 +64,8 @@ namespace XHTDHP_API.Controllers
             else
             {
                 var checkUserNameAndPass = objFunction.checkUserNameAndPassWord(model.userName, model.password);
+                var account = _context.tblAccount.FirstOrDefault(u => u.UserName == model.userName);
+                // var isPasswordMatched = VerifyPassword(model.password, model.StoredSalt, account.Password);
                 if (!checkUserNameAndPass) return responseModel;
                 
                 var user = new AppUser
@@ -98,6 +104,15 @@ namespace XHTDHP_API.Controllers
             {
                 return BadRequest("Vui lòng nhập password");
             }
+            var accountExist = await _context.tblAccount.Where(item => item.UserName == model.UserName).FirstOrDefaultAsync();
+            if (accountExist != null)
+            {
+                return Ok(accountExist);
+            }
+            var hashsalt = EncryptPassword(model.Password);
+            model.Password = hashsalt.Hash;
+            
+            // model.StoredSalt = hashsalt.Salt;
             var newAccount = new tblAccount 
             {
                 UserName = model.UserName,
@@ -108,7 +123,7 @@ namespace XHTDHP_API.Controllers
             };
             await _context.tblAccount.AddAsync(newAccount);
             await _context.SaveChangesAsync();
-            return Ok("Đăng ký thành công");
+            return Ok(hashsalt.Salt);
         }
 
         private async Task<string> GenerateJwtToken(AppUser user)
@@ -139,5 +154,34 @@ namespace XHTDHP_API.Controllers
         //{
 
         //}
+
+        private HashSalt EncryptPassword(string password)
+        {
+            byte[] salt = new byte[128 / 8]; // Generate a 128-bit salt using a secure PRNG
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(salt);
+            }
+            string encryptedPassw = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: password,
+                salt: salt,
+                prf: KeyDerivationPrf.HMACSHA1,
+                iterationCount: 10000,
+                numBytesRequested: 256 / 8
+            ));
+            return new HashSalt { Hash = encryptedPassw , Salt = salt };
+        }
+            
+        private bool VerifyPassword(string enteredPassword, byte[] salt, string storedPassword)
+        {
+            string encryptedPassw = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: enteredPassword,
+                salt: salt,
+                prf: KeyDerivationPrf.HMACSHA1,
+                iterationCount: 10000,
+                numBytesRequested: 256 / 8
+            ));
+            return encryptedPassw == storedPassword;
+        }
     }
 }
