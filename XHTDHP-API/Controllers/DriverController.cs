@@ -47,7 +47,7 @@ namespace XHTDHP_API.Controllers
         public async Task<IActionResult> GetByID(int id)
         {
             var driver = await _context.tblDriver.FindAsync(id);
-            return Ok(new { succeeded = true, message = "Lấy dữ liệu thành công", data = driver });
+            return Ok(driver);
         }
 
         [HttpPost]
