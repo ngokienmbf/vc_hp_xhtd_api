@@ -17,6 +17,8 @@ using XHTDHP_API.Models;
 using XHTDHP_API.ModelsIdentity;
 using System.Collections.Generic;
 using XHTDHP_API.Logging;
+using XHTDHP_API.Entities;
+using XHTDHP_API.Data;
 
 namespace XHTDHP_API.Controllers
 {
@@ -27,6 +29,11 @@ namespace XHTDHP_API.Controllers
     {
         private readonly ILoggerManager _logger;
         private readonly IConfiguration _configuration;
+        private readonly ApiDbContext _context;
+        public AccountController(ApiDbContext context)
+        {
+            _context = context;
+        }
         Function objFunction = new Function();
         //public AccountController(IConfiguration configuration, ILoggerManager logger)
         //{
@@ -78,6 +85,32 @@ namespace XHTDHP_API.Controllers
                 }
             }
         }
+
+        [HttpPost]
+        [Route("/register")]
+        public async Task<IActionResult> Register([FromBody] RegisterDTO model)
+        {
+            if (String.IsNullOrEmpty(model.UserName))
+            {
+                return BadRequest("Vui lòng nhập username");
+            }
+            if (String.IsNullOrEmpty(model.Password))
+            {
+                return BadRequest("Vui lòng nhập password");
+            }
+            var newAccount = new tblAccount 
+            {
+                UserName = model.UserName,
+                Password = model.Password,
+                GroupId = 1,
+                State = true,
+                CreateDay = DateTime.Now
+            };
+            await _context.tblAccount.AddAsync(newAccount);
+            await _context.SaveChangesAsync();
+            return Ok("Đăng ký thành công");
+        }
+
         private async Task<string> GenerateJwtToken(AppUser user)
         {
             var claims = new List<Claim>
