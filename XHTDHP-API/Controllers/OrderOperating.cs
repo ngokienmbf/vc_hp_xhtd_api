@@ -31,6 +31,14 @@ namespace XHTDHP_API.Controllers
             {
                 query = query.Where(item => item.Vehicle.Contains(filter.Keyword));
             }
+            if (!String.IsNullOrEmpty(filter.State))
+            {
+                query = query.Where(item => item.State.ToLower() == filter.State.ToLower());
+            }
+            if (!String.IsNullOrEmpty(filter.DeliveryCode))
+            {
+                query = query.Where(item => item.DeliveryCode.Contains(filter.DeliveryCode));
+            }
             var totalRecords = await query.CountAsync();
             query = query.Skip((filter.Page - 1) * filter.PageSize).Take(filter.PageSize);
             var pagedData = await query.ToListAsync();
