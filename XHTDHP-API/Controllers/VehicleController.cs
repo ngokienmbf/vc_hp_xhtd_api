@@ -54,7 +54,7 @@ namespace XHTDHP_API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Inser([FromBody] tblVehicle model)
+        public async Task<IActionResult> Insert([FromBody] tblVehicle model)
         {
             model.CreateDay = DateTime.Now;
             _context.tblVehicle.Add(model);
