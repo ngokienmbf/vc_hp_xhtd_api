@@ -16,8 +16,8 @@ namespace XHTDHP_API.Entities
         public DateTime? DayExpired { get; set; }
         public string Note { get; set; }
         public bool State { get; set; } = true;
-        public DateTime? CreatedDay { get; set; }
-        public string CreatedBy { get; set; }
+        public DateTime? CreateDay { get; set; }
+        public string CreateBy { get; set; }
         public DateTime? UpdateDay { get; set; }
         public string UpdateBy { get; set; }
         public DateTime? LastEnter { get; set; }

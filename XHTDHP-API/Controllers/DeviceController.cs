@@ -1,23 +1,27 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using XHTDHP_API.Data;
 using XHTDHP_API.Entities;
 using XHTDHP_API.Helpers;
+using XHTDHP_API.Models;
 using XHTDHP_API.Models.Filter;
 
 namespace XHTDHP_API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class RFIDController : ControllerBase
+    public class DeviceController : ControllerBase
     {
         private readonly ApiDbContext _context;
 
-        public RFIDController(ApiDbContext context)
+        public DeviceController(ApiDbContext context)
         {
             _context = context;
         }
@@ -26,36 +30,40 @@ namespace XHTDHP_API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] PaginationFilter filter)
         {
-            var query = _context.tblRFID.OrderBy(item => item.Id).AsNoTracking();
+            var query = _context.tblDevice.OrderBy(item => item.Code).AsNoTracking();
             if (!String.IsNullOrEmpty(filter.Keyword))
             {
-                query = query.Where(item => item.Code.Contains(filter.Keyword));
+                query = query.Where(item => item.Name.Contains(filter.Keyword));
             }
             var totalRecords = await query.CountAsync();
             query = query.Skip((filter.Page - 1) * filter.PageSize).Take(filter.PageSize);
             var pagedData = await query.ToListAsync();
-            var pagedReponse = PaginationHelper.CreatePagedReponse<tblRFID>(pagedData, filter, totalRecords);
+            var pagedReponse = PaginationHelper.CreatePagedReponse<tblDevice>(pagedData, filter, totalRecords);
             return Ok(pagedReponse);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetByID(int id)
+        public async Task<IActionResult> GetByID(int Id)
         {
-            var found = await _context.tblRFID.FindAsync(id);
+            var found = await _context.tblDevice.Where(item => item.Id == Id).FirstOrDefaultAsync();
+            if (found == null)
+            {
+                return BadRequest("Không tìm thấy bản tin");
+            }
             return Ok(found);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Insert([FromBody] tblRFID model)
+        public async Task<IActionResult> Insert([FromBody] tblDevice model)
         {
             model.CreateDay = DateTime.Now;
-            _context.tblRFID.Add(model);
+            _context.tblDevice.Add(model);
             await _context.SaveChangesAsync();
             return Ok(new { succeeded = true, message = "Thêm thành công" });
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] tblRFID model)
+        public async Task<IActionResult> Update([FromBody] tblDevice model)
         {
             model.UpdateDay = DateTime.Now;
             _context.Entry(model).State = EntityState.Modified;
@@ -66,7 +74,7 @@ namespace XHTDHP_API.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var found = _context.tblRFID.Find(id);
+            var found = _context.tblDevice.Where(item => item.Id == id).FirstOrDefault();
             if (found != null)
             {
                 _context.Entry(found).State = EntityState.Deleted;

@@ -19,5 +19,6 @@ namespace XHTDHP_API.Data
         public DbSet<tblAccount> tblAccount { get; set; }
         public DbSet<tblStoreOrderOperating> tblStoreOrderOperating { get; set; }
         public DbSet<tblDriverVehicle> tblDriverVehicle { get; set; }
+        public DbSet<tblDevice> tblDevice { get; set; }
     }
 }
