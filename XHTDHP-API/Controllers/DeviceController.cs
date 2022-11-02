@@ -31,12 +31,12 @@ namespace XHTDHP_API.Controllers
         public async Task<IActionResult> GetAll([FromQuery] PaginationFilter filter)
         {
             var query = _context.tblDevice.OrderBy(item => item.Code).AsNoTracking();
-            if (!String.IsNullOrEmpty(filter.SeachKey))
+            if (!String.IsNullOrEmpty(filter.Keyword))
             {
-                query = query.Where(item => item.Name.Contains(filter.SeachKey));
+                query = query.Where(item => item.Name.Contains(filter.Keyword));
             }
             var totalRecords = await query.CountAsync();
-            query = query.Skip((filter.PageNumber - 1) * filter.PageSize).Take(filter.PageSize);
+            query = query.Skip((filter.Page - 1) * filter.PageSize).Take(filter.PageSize);
             var pagedData = await query.ToListAsync();
             var pagedReponse = PaginationHelper.CreatePagedReponse<tblDevice>(pagedData, filter, totalRecords);
             return Ok(pagedReponse);
