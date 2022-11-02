@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 *.txt
 
+XHTDHP-API/.vscode/tasks.json
+XHTDHP-API/.vscode/launch.json
