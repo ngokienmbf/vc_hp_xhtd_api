@@ -7,14 +7,14 @@ namespace XHTDHP_API.Models.Wrapper
 {
     public class PagedResponse<T> : Response<T>
     {
-        public int PageNumber { get; set; }
+        public int CurrentPage { get; set; }
         public int PageSize { get; set; }
-        public int TotalPages { get; set; }
-        public int TotalRecords { get; set; }
+        public int TotalPage { get; set; }
+        public int TotalRecord { get; set; }
 
-        public PagedResponse(T data, int pageNumber, int pageSize)
+        public PagedResponse(T data, int currentPage, int pageSize)
         {
-            this.PageNumber = pageNumber;
+            this.CurrentPage = currentPage;
             this.PageSize = pageSize;
             this.Data = data;
             this.Message = null;
