@@ -29,7 +29,7 @@ namespace XHTDHP_API.Controllers
             var query = _context.tblRFID.OrderBy(item => item.Id).AsNoTracking();
             if (!String.IsNullOrEmpty(filter.Keyword))
             {
-                query = query.Where(item => item.Code.Contains(filter.Keyword));
+                query = query.Where(item => item.Code.Contains(filter.Keyword) || item.Vehicle.Contains(filter.Keyword));
             }
             var totalRecords = await query.CountAsync();
             query = query.Skip((filter.Page - 1) * filter.PageSize).Take(filter.PageSize);
@@ -48,10 +48,10 @@ namespace XHTDHP_API.Controllers
         [HttpPost]
         public async Task<IActionResult> Insert([FromBody] tblRFID model)
         {
-            model.CreatedDay = DateTime.Now;
+            model.Createday = DateTime.Now;
             _context.tblRFID.Add(model);
             await _context.SaveChangesAsync();
-            return Ok(new { succeeded = true, message = "Thêm thành công" });
+            return Ok(new { succeeded = true, message = "Thêm thành công", statusCode = 200 });
         }
 
         [HttpPut]
@@ -60,7 +60,7 @@ namespace XHTDHP_API.Controllers
             model.UpdateDay = DateTime.Now;
             _context.Entry(model).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-            return Ok(new { succeeded = true, message = "Cập nhật thành công", data = model });
+            return Ok(new { succeeded = true, message = "Cập nhật thành công", data = model, statusCode = 200 });
         }
 
         [HttpDelete("{id}")]
@@ -71,7 +71,7 @@ namespace XHTDHP_API.Controllers
             {
                 _context.Entry(found).State = EntityState.Deleted;
                 _context.SaveChanges();
-                return Ok(new { succeeded = true, message = "Xoá thành công" });
+                return Ok(new { succeeded = true, message = "Xoá thành công", statusCode = 200 });
             }
             else
             {

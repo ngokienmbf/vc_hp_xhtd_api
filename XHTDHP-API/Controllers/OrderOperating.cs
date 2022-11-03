@@ -31,14 +31,15 @@ namespace XHTDHP_API.Controllers
             {
                 query = query.Where(item => item.Vehicle.Contains(filter.Keyword));
             }
-            if (!String.IsNullOrEmpty(filter.State))
-            {
-                query = query.Where(item => item.State.ToLower() == filter.State.ToLower());
-            }
             if (!String.IsNullOrEmpty(filter.DeliveryCode))
             {
                 query = query.Where(item => item.DeliveryCode.Contains(filter.DeliveryCode));
             }
+            if (!String.IsNullOrEmpty(filter.State))
+            {
+                query = query.Where(item => item.State.ToLower() == filter.State.ToLower());
+            }
+
             var totalRecords = await query.CountAsync();
             query = query.Skip((filter.Page - 1) * filter.PageSize).Take(filter.PageSize);
             var pagedData = await query.ToListAsync();
@@ -50,7 +51,7 @@ namespace XHTDHP_API.Controllers
         public async Task<IActionResult> GetByID(int id)
         {
             var found = await _context.tblStoreOrderOperating.FindAsync(id);
-            return Ok(new { succeeded = true, message = "Lấy dữ liệu thành công", data = found });
+            return Ok(new { succeeded = true, message = "Lấy dữ liệu thành công", data = found, statusCode = 200 });
         }
 
         // [HttpPost]
@@ -68,7 +69,7 @@ namespace XHTDHP_API.Controllers
             model.UpdateDay = DateTime.Now;
             _context.Entry(model).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-            return Ok(new { succeeded = true, message = "Cập nhật thành công", data = model });
+            return Ok(new { succeeded = true, message = "Cập nhật thành công", data = model, statusCode = 200 });
         }
 
         // [HttpDelete("{id}")]

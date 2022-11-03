@@ -46,7 +46,7 @@ namespace XHTDHP_API.Controllers
             {
                 return BadRequest("Không tìm thấy phương tiện");
             }
-            return Ok(new { succeeded = true, message = "Lấy dữ liệu thành công", data = found });
+            return Ok(new { succeeded = true, message = "Lấy dữ liệu thành công", data = found, statusCode = 200 });
         }
 
         [HttpPost]
@@ -64,7 +64,7 @@ namespace XHTDHP_API.Controllers
             model.UpdateDay = DateTime.Now;
             _context.Entry(model).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-            return Ok(new { succeeded = true, message = "Cập nhật thành công", data = model });
+            return Ok(new { succeeded = true, message = "Cập nhật thành công", data = model, statusCode = 200 });
         }
 
         [HttpDelete("{id}")]
@@ -75,7 +75,7 @@ namespace XHTDHP_API.Controllers
             {
                 _context.Entry(found).State = EntityState.Deleted;
                 _context.SaveChanges();
-                return Ok(new { succeeded = true, message = "Xoá thành công" });
+                return Ok(new { succeeded = true, message = "Xoá thành công", statusCode = 200 });
             }
             else
             {
