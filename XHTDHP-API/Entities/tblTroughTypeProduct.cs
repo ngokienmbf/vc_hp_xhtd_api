@@ -10,10 +10,9 @@ namespace XHTDHP_API.Entities
     {
         [Key]
         public int Id { get; set; }
+        [MaxLength(5)]
         public string TroughCode { get; set; }
         public string TypeProduct { get; set; }
-        public Nullable<int> Status { get; set; }
-        public string LogResponse { get; set; }
         public Nullable<System.DateTime> CreateDay { get; set; }
         public string CreateBy { get; set; }
         public Nullable<System.DateTime> UpdateDay { get; set; }
