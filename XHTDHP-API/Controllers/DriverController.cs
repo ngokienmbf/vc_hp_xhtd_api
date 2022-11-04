@@ -43,10 +43,26 @@ namespace XHTDHP_API.Controllers
             return Ok(pagedReponse);
         }
 
+        [HttpGet("GetFull")]
+        public async Task<IActionResult> GetFull()
+        {
+            var query = await _context.tblDriver.OrderBy(item => item.UserName).ToListAsync();
+            return Ok(query);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByID(int id)
         {
             var driver = await _context.tblDriver.FindAsync(id);
+            return Ok(driver);
+        }
+
+        [HttpGet("GetWithVehicles/{id}")]
+        public async Task<IActionResult> GetWithVehicles(int id)
+        {
+            var driver = await _context.tblDriver.FindAsync(id);
+            var found = await _context.tblDriverVehicle.Where(item => item.UserName==driver.UserName).Select(item => item.Vehicle).ToListAsync();
+            driver.Vehicles = found;
             return Ok(driver);
         }
 

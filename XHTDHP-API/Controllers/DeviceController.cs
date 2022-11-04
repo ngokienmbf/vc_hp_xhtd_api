@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using XHTDHP_API.Data;
@@ -39,13 +40,14 @@ namespace XHTDHP_API.Controllers
             query = query.Skip((filter.Page - 1) * filter.PageSize).Take(filter.PageSize);
             var pagedData = await query.ToListAsync();
             var pagedReponse = PaginationHelper.CreatePagedReponse<tblDevice>(pagedData, filter, totalRecords);
+            // SqlConnection sqlCon = _context.Database.GetDbConnection() as SqlConnection;
             return Ok(pagedReponse);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetByID(int Id)
+        public async Task<IActionResult> GetByID(int id)
         {
-            var found = await _context.tblDevice.Where(item => item.Id == Id).FirstOrDefaultAsync();
+            var found = await _context.tblDevice.Where(item => item.Id == id).FirstOrDefaultAsync();
             if (found == null)
             {
                 return BadRequest("Không tìm thấy bản tin");
@@ -53,6 +55,7 @@ namespace XHTDHP_API.Controllers
             return Ok(found);
         }
 
+        
         [HttpPost]
         public async Task<IActionResult> Insert([FromBody] tblDevice model)
         {
