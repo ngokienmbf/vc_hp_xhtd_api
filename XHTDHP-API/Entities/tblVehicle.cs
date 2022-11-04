@@ -13,8 +13,8 @@ namespace XHTDHP_API.Entities
         public string Vehicle { get; set; }
         public Nullable<double> Tonnage { get; set; }
         public Nullable<double> TonnageDefault { get; set; }
-        public string NameDriver { get; set; }
-        public string IdCardNumber { get; set; }
+        public string? NameDriver { get; set; }
+        public string? IdCardNumber { get; set; }
         public Nullable<double> HeightVehicle { get; set; }
         public Nullable<double> WidthVehicle { get; set; }
         public Nullable<double> LongVehicle { get; set; }
