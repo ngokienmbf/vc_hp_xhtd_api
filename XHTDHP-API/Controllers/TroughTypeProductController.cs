@@ -13,11 +13,11 @@ namespace XHTDHP_API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class DriverVehicleController : ControllerBase
+    public class TroughTypeProductController : ControllerBase
     {
         private readonly ApiDbContext _context;
 
-        public DriverVehicleController(ApiDbContext context)
+        public TroughTypeProductController(ApiDbContext context)
         {
             _context = context;
         }
@@ -26,49 +26,36 @@ namespace XHTDHP_API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] PaginationFilter filter)
         {
-            var query = _context.tblDriverVehicle.OrderBy(item => item.Id).AsNoTracking();
+            var query = _context.tblTroughTypeProduct.OrderBy(item => item.Id).AsNoTracking();
             if (!String.IsNullOrEmpty(filter.Keyword))
             {
-                query = query.Where(item => item.Vehicle.Contains(filter.Keyword) || item.UserName.Contains(filter.Keyword) );
+                query = query.Where(item => item.TroughCode.Contains(filter.Keyword));
             }
             var totalRecords = await query.CountAsync();
             query = query.Skip((filter.Page - 1) * filter.PageSize).Take(filter.PageSize);
             var pagedData = await query.ToListAsync();
-            var pagedReponse = PaginationHelper.CreatePagedReponse<tblDriverVehicle>(pagedData, filter, totalRecords);
+            var pagedReponse = PaginationHelper.CreatePagedReponse<tblTroughTypeProduct>(pagedData, filter, totalRecords);
             return Ok(pagedReponse);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByID(int id)
         {
-            var found = await _context.tblDriverVehicle.FindAsync(id);
-            if (found == null)
-            {
-                return BadRequest("Không tìm thấy phương tiện");
-            }
-            return Ok(found);
-        }
-
-        [HttpGet("GetByDriver/{driver}")]
-        public async Task<IActionResult> GetByDriver(string driver)
-        {
-            var found = await _context.tblDriverVehicle.Where(item => item.UserName == (driver)).ToListAsync();
-            return Ok(found);
+            var driver = await _context.tblTroughTypeProduct.FindAsync(id);
+            return Ok(driver);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Insert([FromBody] tblDriverVehicle model)
+        public async Task<IActionResult> Insert([FromBody] tblTroughTypeProduct model)
         {
-            model.CreateDay = DateTime.Now;
-            _context.tblDriverVehicle.Add(model);
+            _context.tblTroughTypeProduct.Add(model);
             await _context.SaveChangesAsync();
-            return Ok(new { succeeded = true, message = "Thêm thành công" });
+            return Ok(new { succeeded = true, message = "Thêm thành công", statusCode = 200 });
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] tblDriverVehicle model)
+        public async Task<IActionResult> Update([FromBody] tblTroughTypeProduct model)
         {
-            model.UpdateDay = DateTime.Now;
             _context.Entry(model).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return Ok(new { succeeded = true, message = "Cập nhật thành công", data = model, statusCode = 200 });
@@ -77,7 +64,7 @@ namespace XHTDHP_API.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var found = _context.tblDriverVehicle.Find(id);
+            var found = _context.tblTroughTypeProduct.Find(id);
             if (found != null)
             {
                 _context.Entry(found).State = EntityState.Deleted;
