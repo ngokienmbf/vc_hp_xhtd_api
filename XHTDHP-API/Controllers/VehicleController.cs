@@ -30,7 +30,7 @@ namespace XHTDHP_API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] PaginationFilter filter)
         {
-            var query = _context.tblVehicle.OrderBy(item => item.IDVehicle).AsNoTracking();
+            var query = _context.tblVehicle.OrderBy(item => item.Vehicle).AsNoTracking();
             if (!String.IsNullOrEmpty(filter.Keyword))
             {
                 query = query.Where(item => item.Vehicle.Contains(filter.Keyword));
@@ -39,6 +39,22 @@ namespace XHTDHP_API.Controllers
             query = query.Skip((filter.Page - 1) * filter.PageSize).Take(filter.PageSize);
             var pagedData = await query.ToListAsync();
             var pagedReponse = PaginationHelper.CreatePagedReponse<tblVehicle>(pagedData, filter, totalRecords);
+            
+            var driverVehicles = await _context.tblDriverVehicle.OrderBy(item => item.Vehicle).Where(item => item.Vehicle.Contains(filter.Keyword)).ToListAsync();
+            
+            int tmp = 0;
+            for (int i = 0; i < driverVehicles.Count(); i++)
+            {
+                for (int j = tmp; j < pagedData.Count(); j++)
+                {
+                    if (driverVehicles[i].Vehicle == pagedData[j].Vehicle)
+                    {
+                        pagedData[j].UserName = driverVehicles[i].UserName;
+                        tmp = j+1; // tang hieu suat
+                        break;
+                    }
+                }
+            }
             return Ok(pagedReponse);
         }
 
@@ -50,6 +66,46 @@ namespace XHTDHP_API.Controllers
             {
                 return BadRequest("Không tìm thấy phương tiện");
             }
+            return Ok(found);
+        }
+        
+        [HttpGet("GetFreeVehicles/{vehicle}")]
+        public IActionResult getFreeVehicles(string vehicle)
+        {
+            var found =  _context.tblVehicle.Where( item => item.Vehicle ==  vehicle || 
+                       !_context.tblDriverVehicle.Any(f => f.Vehicle == item.Vehicle))
+                        .Select(item => new {Id = item.IDVehicle, Vehicle = item.Vehicle}).ToList();
+            return Ok(found);
+        }
+        
+        [HttpGet("GetWithDriver/{id}")]
+        public async Task<IActionResult> GetWithVehicle(int id)
+        {
+            var found = await (from p in _context.tblVehicle join o in _context.tblDriverVehicle
+            on p.Vehicle equals o.Vehicle into gj from subpet in gj.DefaultIfEmpty()
+            where p.IDVehicle == id
+            select new  
+            {  
+                 p.IDVehicle
+                ,p.Vehicle
+                ,p.Tonnage
+                ,p.TonnageDefault
+                ,p.NameDriver
+                ,p.IdCardNumber
+                ,p.HeightVehicle
+                ,p.WidthVehicle
+                ,p.LongVehicle
+                ,p.UnladenWeight1
+                ,p.UnladenWeight2
+                ,p.UnladenWeight3
+                ,p.IsSetMediumUnladenWeight
+                ,p.CreateDay
+                ,p.CreateBy
+                ,p.UpdateDay
+                ,p.UpdateBy,
+                 UserName = subpet.UserName ?? string.Empty
+            }).FirstOrDefaultAsync();     
+
             return Ok(found);
         }
 
@@ -68,6 +124,31 @@ namespace XHTDHP_API.Controllers
             model.UpdateDay = DateTime.Now;
             _context.Entry(model).State = EntityState.Modified;
             await _context.SaveChangesAsync();
+            
+            if (!String.IsNullOrEmpty(model.UserName)) {
+                var found = await _context.tblDriverVehicle.Where(item => item.Vehicle == model.Vehicle).FirstOrDefaultAsync();
+                
+                if(found != null && found.UserName != model.UserName ){
+                    if(found.UserName != model.UserName)
+                    _context.Entry(found).State = EntityState.Deleted;
+                    _context.SaveChanges();
+                }
+                if(found == null || (found != null && found.UserName != model.UserName)) {
+                    var _driverVehicle = new tblDriverVehicle
+                    {
+                        UserName = model.UserName,
+                        Vehicle = model.Vehicle,
+                        CreateDay = DateTime.Now,
+                        UpdateDay= DateTime.Now,
+                        CreateBy = model.UpdateBy,
+                        UpdateBy = model.UpdateBy,
+                    };
+
+                    _context.tblDriverVehicle.Add(_driverVehicle);
+                    await _context.SaveChangesAsync();
+                }
+            }
+
             return Ok(new { succeeded = true, message = "Cập nhật thành công", data = model });
         }
 

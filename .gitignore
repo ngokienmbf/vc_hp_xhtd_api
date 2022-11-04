@@ -365,3 +365,20 @@ FodyWeavers.xsd
 
 XHTDHP-API/.vscode/tasks.json
 XHTDHP-API/.vscode/launch.json
+XHTDHP-API/bin/Debug/netcoreapp3.1/XHTDHP-API.deps.json
+XHTDHP-API/bin/Debug/netcoreapp3.1/XHTDHP-API.dll
+XHTDHP-API/bin/Debug/netcoreapp3.1/XHTDHP-API.pdb
+XHTDHP-API/bin/Debug/netcoreapp3.1/XHTDHP-API.runtimeconfig.dev.json
+XHTDHP-API/obj/project.assets.json
+XHTDHP-API/obj/project.nuget.cache
+XHTDHP-API/obj/XHTDHP-API.csproj.nuget.dgspec.json
+XHTDHP-API/obj/XHTDHP-API.csproj.nuget.g.props
+XHTDHP-API/obj/XHTDHP-API.csproj.nuget.g.targets
+XHTDHP-API/obj/Debug/netcoreapp3.1/XHTDHP-API.assets.cache
+XHTDHP-API/obj/Debug/netcoreapp3.1/XHTDHP-API.csproj.AssemblyReference.cache
+XHTDHP-API/obj/Debug/netcoreapp3.1/XHTDHP-API.csproj.CoreCompileInputs.cache
+XHTDHP-API/obj/Debug/netcoreapp3.1/XHTDHP-API.csproj.FileListAbsolute.txt
+XHTDHP-API/obj/Debug/netcoreapp3.1/XHTDHP-API.dll
+XHTDHP-API/obj/Debug/netcoreapp3.1/XHTDHP-API.GeneratedMSBuildEditorConfig.editorconfig
+XHTDHP-API/obj/Debug/netcoreapp3.1/XHTDHP-API.genruntimeconfig.cache
+XHTDHP-API/obj/Debug/netcoreapp3.1/XHTDHP-API.pdb

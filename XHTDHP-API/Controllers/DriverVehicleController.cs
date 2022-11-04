@@ -29,7 +29,7 @@ namespace XHTDHP_API.Controllers
             var query = _context.tblDriverVehicle.OrderBy(item => item.Id).AsNoTracking();
             if (!String.IsNullOrEmpty(filter.Keyword))
             {
-                query = query.Where(item => item.Vehicle.Contains(filter.Keyword));
+                query = query.Where(item => item.Vehicle.Contains(filter.Keyword) || item.UserName.Contains(filter.Keyword) );
             }
             var totalRecords = await query.CountAsync();
             query = query.Skip((filter.Page - 1) * filter.PageSize).Take(filter.PageSize);
@@ -46,11 +46,18 @@ namespace XHTDHP_API.Controllers
             {
                 return BadRequest("Không tìm thấy phương tiện");
             }
-            return Ok(new { succeeded = true, message = "Lấy dữ liệu thành công", data = found });
+            return Ok(found);
+        }
+
+        [HttpGet("GetByDriver/{driver}")]
+        public async Task<IActionResult> GetByDriver(string driver)
+        {
+            var found = await _context.tblDriverVehicle.Where(item => item.UserName == (driver)).ToListAsync();
+            return Ok(found);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Inser([FromBody] tblDriverVehicle model)
+        public async Task<IActionResult> Insert([FromBody] tblDriverVehicle model)
         {
             model.CreateDay = DateTime.Now;
             _context.tblDriverVehicle.Add(model);

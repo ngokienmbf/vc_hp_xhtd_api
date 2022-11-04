@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,6 +11,9 @@ namespace XHTDHP_API.Entities
     {
         [Key]
         public int Id { get; set; }
+        [MaxLength(50)]
+        public string UserName { get; set; }
+        public bool State { get; set; } = true;
         [MaxLength(250)]
         public string FullName { get; set; }
         [MaxLength(50)]
@@ -23,12 +27,11 @@ namespace XHTDHP_API.Entities
         public string IdCard { get; set; }
         [MaxLength(500)]
         public string Address { get; set; }
-        [MaxLength(50)]
-        public string UserName { get; set; }
-        public bool State { get; set; } = true;
         public DateTime? CreateDay { get; set; }
         public string CreateBy { get; set; }
         public DateTime? UpdateDay { get; set; }
         public string UpdateBy { get; set; }
+        [NotMapped]
+        public virtual List<String> Vehicles {get; set;}
     }
 }
