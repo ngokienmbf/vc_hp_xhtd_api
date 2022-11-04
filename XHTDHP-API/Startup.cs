@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -52,6 +53,10 @@ namespace XHTDHP_API
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            else
+            {
+                app.UseHsts();
+            }
 
             app.UseCors(x => x
            .AllowAnyMethod()
@@ -65,11 +70,16 @@ namespace XHTDHP_API
 
             app.UseAuthorization();
 
+            app.UseStaticFiles();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
 
+            app.Run(async(context) => {
+                await context.Response.WriteAsync("Could not find anything");
+            });
                         
         }
     }
