@@ -86,5 +86,43 @@ namespace XHTDHP_API.Controllers
                 return BadRequest(new { succeeded = false, message = "Có lỗi xảy ra" });
             }
         }
+
+        [HttpGet]
+        [Route("getVehiclesNoRfid")]
+        public async Task<IActionResult> GetVehiclesNoRfid([FromQuery] PaginationFilter filter)
+        {
+            var query = from v in _context.tblVehicle
+                        join r in _context.tblRFID on v.Vehicle equals r.Vehicle into verf
+                        from t in verf.DefaultIfEmpty() where t.Code == null
+                        select new tblVehicle
+                        {
+                            IDVehicle = v.IDVehicle,
+                            Vehicle = v.Vehicle,
+                            Tonnage = v.Tonnage,
+                            TonnageDefault = v.TonnageDefault,
+                            NameDriver = v.NameDriver,
+                            IdCardNumber = v.IdCardNumber,
+                            HeightVehicle = v.HeightVehicle,
+                            WidthVehicle = v.WidthVehicle,
+                            LongVehicle = v.LongVehicle,
+                            UnladenWeight1 = v.UnladenWeight1,
+                            UnladenWeight2 = v.UnladenWeight2,
+                            UnladenWeight3 = v.UnladenWeight3,
+                            IsSetMediumUnladenWeight = v.IsSetMediumUnladenWeight,
+                            CreateDay = v.CreateDay,
+                            CreateBy = v.CreateBy,
+                            UpdateDay = v.UpdateDay,
+                            UpdateBy = v.UpdateBy,
+                        };
+            if (!String.IsNullOrEmpty(filter.Keyword))
+            {
+                query = query.Where(item => item.Vehicle.Contains(filter.Keyword));
+            }
+            var totalRecords = await query.CountAsync();
+            query = query.Skip((filter.Page - 1) * filter.PageSize).Take(filter.PageSize);
+            var pagedData = await query.ToListAsync();
+            var pagedReponse = PaginationHelper.CreatePagedReponse<tblVehicle>(pagedData, filter, totalRecords);
+            return Ok(pagedReponse);
+        }
     }
 }

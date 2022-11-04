@@ -65,7 +65,7 @@ namespace XHTDHP_API.Controllers
             };
             await _context.tblAccount.AddAsync(newAccount);
             await _context.SaveChangesAsync();
-            return Ok(new { succeeded = true, message = "Thêm thành công" });
+            return Ok(new { succeeded = true, message = "Thêm thành công", statusCode = 200 });
         }
 
         [HttpPut]
@@ -73,7 +73,7 @@ namespace XHTDHP_API.Controllers
         {
             _context.Entry(model).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-            return Ok(new { succeeded = true, message = "Cập nhật thành công", data = model });
+            return Ok(new { succeeded = true, message = "Cập nhật thành công", data = model, statusCode = 200 });
         }
 
         [HttpDelete("{id}")]
@@ -84,7 +84,7 @@ namespace XHTDHP_API.Controllers
             {
                 _context.Entry(driver).State = EntityState.Deleted;
                 _context.SaveChanges();
-                return Ok(new { succeeded = true, message = "Xoá thành công" });
+                return Ok(new { succeeded = true, message = "Xoá thành công", statusCode = 200 });
             }
             else
             {
