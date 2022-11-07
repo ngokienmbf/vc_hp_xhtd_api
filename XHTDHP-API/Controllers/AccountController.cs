@@ -65,7 +65,6 @@ namespace XHTDHP_API.Controllers
             {
                 var checkUserNameAndPass = objFunction.checkUserNameAndPassWord(model.userName, model.password);
                 var account = _context.tblAccount.FirstOrDefault(u => u.UserName == model.userName);
-                // var isPasswordMatched = VerifyPassword(model.password, model.StoredSalt, account.Password);
                 if (!checkUserNameAndPass) return responseModel;
                 
                 var user = new AppUser
@@ -107,23 +106,22 @@ namespace XHTDHP_API.Controllers
             var accountExist = await _context.tblAccount.Where(item => item.UserName == model.UserName).FirstOrDefaultAsync();
             if (accountExist != null)
             {
-                return Ok(accountExist);
+                return BadRequest("Tài khoản đã tồn tại");
             }
-            var hashsalt = EncryptPassword(model.Password);
-            model.Password = hashsalt.Hash;
+            var hashPassord = objFunction.CryptographyMD5(model.Password);
             
             // model.StoredSalt = hashsalt.Salt;
             var newAccount = new tblAccount 
             {
                 UserName = model.UserName,
-                Password = model.Password,
+                Password = hashPassord,
                 GroupId = 1,
                 State = true,
                 CreateDay = DateTime.Now
             };
             await _context.tblAccount.AddAsync(newAccount);
             await _context.SaveChangesAsync();
-            return Ok(hashsalt.Salt);
+            return Ok(new { statusCode = 200, message = "Đăng ký tài khoản thành công"});
         }
 
         private async Task<string> GenerateJwtToken(AppUser user)
@@ -146,42 +144,6 @@ namespace XHTDHP_API.Controllers
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-        //[HttpPost]
-        //[Route("api/Login")]
-        //[Authorize]
-        //public Account Login(Account objAccountLogin)
-        //{
-
-        //}
-
-        private HashSalt EncryptPassword(string password)
-        {
-            byte[] salt = new byte[128 / 8]; // Generate a 128-bit salt using a secure PRNG
-            using (var rng = RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(salt);
-            }
-            string encryptedPassw = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: password,
-                salt: salt,
-                prf: KeyDerivationPrf.HMACSHA1,
-                iterationCount: 10000,
-                numBytesRequested: 256 / 8
-            ));
-            return new HashSalt { Hash = encryptedPassw , Salt = salt };
-        }
-            
-        private bool VerifyPassword(string enteredPassword, byte[] salt, string storedPassword)
-        {
-            string encryptedPassw = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: enteredPassword,
-                salt: salt,
-                prf: KeyDerivationPrf.HMACSHA1,
-                iterationCount: 10000,
-                numBytesRequested: 256 / 8
-            ));
-            return encryptedPassw == storedPassword;
         }
     }
 }
