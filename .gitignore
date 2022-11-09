@@ -382,3 +382,8 @@ XHTDHP-API/obj/Debug/netcoreapp3.1/XHTDHP-API.dll
 XHTDHP-API/obj/Debug/netcoreapp3.1/XHTDHP-API.GeneratedMSBuildEditorConfig.editorconfig
 XHTDHP-API/obj/Debug/netcoreapp3.1/XHTDHP-API.genruntimeconfig.cache
 XHTDHP-API/obj/Debug/netcoreapp3.1/XHTDHP-API.pdb
+
+XHTDHP-API/bin/Debug/netcoreapp3.1/XHTDHP-API.dll
+XHTDHP-API/bin/Debug/netcoreapp3.1/XHTDHP-API.pdb
+XHTDHP-API/obj/Debug/netcoreapp3.1/XHTDHP-API.dll
+XHTDHP-API/obj/Debug/netcoreapp3.1/XHTDHP-API.pdb

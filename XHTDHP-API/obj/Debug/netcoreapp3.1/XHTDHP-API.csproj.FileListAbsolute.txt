@@ -431,3 +431,13 @@ C:/Users/ADMIN/Documents/GitHub/vc_hp_xhtd_api/XHTDHP-API/obj/Debug/netcoreapp3.
 C:/Users/ADMIN/Documents/GitHub/vc_hp_xhtd_api/XHTDHP-API/obj/Debug/netcoreapp3.1/XHTDHP-API.dll
 C:/Users/ADMIN/Documents/GitHub/vc_hp_xhtd_api/XHTDHP-API/obj/Debug/netcoreapp3.1/XHTDHP-API.pdb
 C:/Users/ADMIN/Documents/GitHub/vc_hp_xhtd_api/XHTDHP-API/obj/Debug/netcoreapp3.1/XHTDHP-API.genruntimeconfig.cache
+/media/manh/DATA/workspace/mobifone/vc_hp_xhtd_api/XHTDHP-API/bin/Debug/netcoreapp3.1/EPPlus.dll
+/media/manh/DATA/workspace/mobifone/vc_hp_xhtd_api/XHTDHP-API/bin/Debug/netcoreapp3.1/EPPlus.Interfaces.dll
+/media/manh/DATA/workspace/mobifone/vc_hp_xhtd_api/XHTDHP-API/bin/Debug/netcoreapp3.1/EPPlus.System.Drawing.dll
+/media/manh/DATA/workspace/mobifone/vc_hp_xhtd_api/XHTDHP-API/bin/Debug/netcoreapp3.1/Microsoft.Extensions.Configuration.dll
+/media/manh/DATA/workspace/mobifone/vc_hp_xhtd_api/XHTDHP-API/bin/Debug/netcoreapp3.1/Microsoft.Extensions.Configuration.FileExtensions.dll
+/media/manh/DATA/workspace/mobifone/vc_hp_xhtd_api/XHTDHP-API/bin/Debug/netcoreapp3.1/Microsoft.Extensions.Configuration.Json.dll
+/media/manh/DATA/workspace/mobifone/vc_hp_xhtd_api/XHTDHP-API/bin/Debug/netcoreapp3.1/Microsoft.Extensions.FileProviders.Abstractions.dll
+/media/manh/DATA/workspace/mobifone/vc_hp_xhtd_api/XHTDHP-API/bin/Debug/netcoreapp3.1/Microsoft.Extensions.FileProviders.Physical.dll
+/media/manh/DATA/workspace/mobifone/vc_hp_xhtd_api/XHTDHP-API/bin/Debug/netcoreapp3.1/Microsoft.Extensions.FileSystemGlobbing.dll
+/media/manh/DATA/workspace/mobifone/vc_hp_xhtd_api/XHTDHP-API/bin/Debug/netcoreapp3.1/Microsoft.IO.RecyclableMemoryStream.dll

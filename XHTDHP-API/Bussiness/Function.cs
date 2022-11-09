@@ -30,7 +30,7 @@ namespace XHTDHP_API.Bussiness
                 SqlCommand Cmd = sqlCon.CreateCommand();
                 Cmd.CommandText = "SELECT * FROM tblAccount WHERE UserName = @UserName AND PassWord = @PassWord AND State = 1";
                 Cmd.Parameters.Add("UserName", SqlDbType.NVarChar).Value = UserName;
-                Cmd.Parameters.Add("PassWord", SqlDbType.NVarChar).Value = PassWord;
+                Cmd.Parameters.Add("PassWord", SqlDbType.NVarChar).Value = CryptographyMD5(PassWord);
                 SqlDataReader Rd = Cmd.ExecuteReader();
                 while (Rd.Read())
                 {
@@ -51,5 +51,18 @@ namespace XHTDHP_API.Bussiness
             return tmpValue;
         }
         #endregion
+
+        public string CryptographyMD5(string source)
+        {
+            System.Security.Cryptography.MD5CryptoServiceProvider objMD5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
+            byte[] buffer = System.Text.Encoding.UTF8.GetBytes(source);
+            byte[] bytHash = objMD5.ComputeHash(buffer);
+            string result = "";
+            foreach (byte a in bytHash)
+            {
+                result += int.Parse(a.ToString(), System.Globalization.NumberStyles.HexNumber).ToString();
+            }
+            return result;
+        }
     }
 }
