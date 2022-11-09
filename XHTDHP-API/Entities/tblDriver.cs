@@ -32,6 +32,6 @@ namespace XHTDHP_API.Entities
         public DateTime? UpdateDay { get; set; }
         public string UpdateBy { get; set; }
         [NotMapped]
-        public virtual List<String> Vehicles {get; set;}
+        public List<String> Vehicles {get; set;}
     }
 }
