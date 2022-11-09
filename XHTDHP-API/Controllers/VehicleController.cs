@@ -72,10 +72,11 @@ namespace XHTDHP_API.Controllers
         [HttpGet("GetFreeVehicles/{vehicle}")]
         public IActionResult getFreeVehicles(string vehicle)
         {
-            var found =  _context.tblVehicle.Where( item => item.Vehicle ==  vehicle || 
-                       !_context.tblDriverVehicle.Any(f => f.Vehicle == item.Vehicle))
-                        .Select(item => new {Id = item.IDVehicle, Vehicle = item.Vehicle}).ToList();
-            return Ok(found);
+            // var found =  _context.tblVehicle.Where( item => item.Vehicle ==  vehicle || 
+            //            !_context.tblDriverVehicle.Any(f => f.Vehicle == item.Vehicle))
+            //             .Select(item => new {Id = item.IDVehicle, Vehicle = item.Vehicle}).ToList();
+            var query =  _context.tblVehicle.OrderBy(item => item.Vehicle).ToList();
+            return Ok(query);
         }
         
         [HttpGet("GetWithDriver/{id}")]

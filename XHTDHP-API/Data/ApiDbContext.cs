@@ -20,7 +20,8 @@ namespace XHTDHP_API.Data
         public DbSet<tblStoreOrderOperating> tblStoreOrderOperating { get; set; }
         public DbSet<tblDriverVehicle> tblDriverVehicle { get; set; }
         public DbSet<tblRFIDSign> tblRFIDSign { get; set; }
-        public DbSet<tblDevice> tblDevice { get; set; }
+        public DbSet<tblCategoriesDevices> tblCategoriesDevices { get; set; }
+        public DbSet<tblCategories> tblCategories { get; set; }
         public DbSet<tblTrough> tblTrough { get; set; }
         public DbSet<tblTroughTypeProduct> tblTroughTypeProduct { get; set; }
     }
