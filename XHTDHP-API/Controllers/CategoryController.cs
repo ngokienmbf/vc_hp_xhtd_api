@@ -18,11 +18,11 @@ namespace XHTDHP_API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class DeviceController : ControllerBase
+    public class CategoryController : ControllerBase
     {
         private readonly ApiDbContext _context;
 
-        public DeviceController(ApiDbContext context)
+        public CategoryController(ApiDbContext context)
         {
             _context = context;
         }
@@ -31,7 +31,7 @@ namespace XHTDHP_API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] PaginationFilter filter)
         {
-            var query = _context.tblCategoriesDevices.OrderBy(item => item.ShowIndex).AsNoTracking();
+            var query = _context.tblCategories.OrderBy(item => item.ShowIndex).AsNoTracking();
             if (!String.IsNullOrEmpty(filter.Keyword))
             {
                 query = query.Where(item => item.Name.Contains(filter.Keyword));
@@ -39,15 +39,22 @@ namespace XHTDHP_API.Controllers
             var totalRecords = await query.CountAsync();
             query = query.Skip((filter.Page - 1) * filter.PageSize).Take(filter.PageSize);
             var pagedData = await query.ToListAsync();
-            var pagedReponse = PaginationHelper.CreatePagedReponse<tblCategoriesDevices>(pagedData, filter, totalRecords);
+            var pagedReponse = PaginationHelper.CreatePagedReponse<tblCategories>(pagedData, filter, totalRecords);
             // SqlConnection sqlCon = _context.Database.GetDbConnection() as SqlConnection;
             return Ok(pagedReponse);
+        }
+
+        [HttpGet("GetFull")]
+        public async Task<IActionResult> GetFull()
+        {
+            var query = await _context.tblCategories.OrderBy(item => item.ShowIndex).ToListAsync();
+            return Ok(query);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByID(int id)
         {
-            var found = await _context.tblCategoriesDevices.Where(item => item.Id == id).FirstOrDefaultAsync();
+            var found = await _context.tblCategories.Where(item => item.Id == id).FirstOrDefaultAsync();
             if (found == null)
             {
                 return BadRequest("Không tìm thấy bản tin");
@@ -55,24 +62,18 @@ namespace XHTDHP_API.Controllers
             return Ok(found);
         }
 
-        [HttpGet("GetFull")]
-        public async Task<IActionResult> GetFull()
-        {
-            var query = await _context.tblCategoriesDevices.OrderBy(item => item.ShowIndex).ToListAsync();
-            return Ok(query);
-        }
         
         [HttpPost]
-        public async Task<IActionResult> Insert([FromBody] tblCategoriesDevices model)
+        public async Task<IActionResult> Insert([FromBody] tblCategories model)
         {
             model.CreateDay = DateTime.Now;
-            _context.tblCategoriesDevices.Add(model);
+            _context.tblCategories.Add(model);
             await _context.SaveChangesAsync();
             return Ok(new { succeeded = true, message = "Thêm thành công" });
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] tblCategoriesDevices model)
+        public async Task<IActionResult> Update([FromBody] tblCategories model)
         {
             model.UpdateDay = DateTime.Now;
             _context.Entry(model).State = EntityState.Modified;
@@ -83,7 +84,7 @@ namespace XHTDHP_API.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var found = _context.tblCategoriesDevices.Where(item => item.Id == id).FirstOrDefault();
+            var found = _context.tblCategories.Where(item => item.Id == id).FirstOrDefault();
             if (found != null)
             {
                 _context.Entry(found).State = EntityState.Deleted;
