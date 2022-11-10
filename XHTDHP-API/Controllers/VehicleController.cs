@@ -86,7 +86,7 @@ namespace XHTDHP_API.Controllers
             on p.Vehicle equals o.Vehicle into gj from subpet in gj.DefaultIfEmpty()
             where p.IDVehicle == id
             select new  
-            {  
+            { 
                  p.IDVehicle
                 ,p.Vehicle
                 ,p.Tonnage

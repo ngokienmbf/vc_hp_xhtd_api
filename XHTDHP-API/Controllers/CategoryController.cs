@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -38,10 +39,65 @@ namespace XHTDHP_API.Controllers
             }
             var totalRecords = await query.CountAsync();
             query = query.Skip((filter.Page - 1) * filter.PageSize).Take(filter.PageSize);
+
+
             var pagedData = await query.ToListAsync();
             var pagedReponse = PaginationHelper.CreatePagedReponse<tblCategories>(pagedData, filter, totalRecords);
-            // SqlConnection sqlCon = _context.Database.GetDbConnection() as SqlConnection;
             return Ok(pagedReponse);
+        }
+
+
+        [HttpGet("GetAllWithDevice")]
+        public  IActionResult GetAllWithDevice([FromQuery] PaginationFilter filter)
+        {
+             var query =   _context.tblCategories.OrderBy(x => x.ShowIndex).AsNoTracking()    ;
+            if (!String.IsNullOrEmpty(filter.Keyword))
+            {
+                query = query.Where(item => item.Name.Contains(filter.Keyword));
+            }
+            var totalRecords = query.Count();
+            var query2 = query.Skip((filter.Page - 1) * filter.PageSize).Take(filter.PageSize);
+            
+            var pagedData =   query2.ToList()
+                                 .GroupJoin(_context.tblCategoriesDevices,
+                                            catory => catory.Code,
+                                            catorydevice => catorydevice.CatCode,
+                                            (catory, catoryDevice) => new CategoryDTO {
+                                                Id = catory.Id,
+                                                Code = catory.Code,
+                                                Name = catory.Name, 
+                                                State = catory.State, 
+                                                ShowIndex = catory.ShowIndex, 
+                                                Devices = catoryDevice.Select(i => new CategoryDTO.DeviceDTO {
+                                                Code = i.Code,
+                                                CatCode = i.CatCode,
+                                                Name = i.Name, 
+                                                State = i.State, 
+                                                ShowIndex = i.ShowIndex }
+                                                ).OrderBy(x => x.ShowIndex).ToList(),
+                                            }).ToList();         
+
+            //var pagedData = query2.ToList();
+            var pagedReponse = PaginationHelper.CreatePagedReponse<CategoryDTO>(pagedData, filter, totalRecords);
+            return Ok(pagedReponse);
+        }
+        public class CategoryDTO
+        {
+            public int Id { get; set; }
+            public string Code { get; set; }
+            public string? Name { get; set; }
+            public bool State { get; set; } = true;
+            public Nullable<int> ShowIndex { get; set; }
+            public List<DeviceDTO> Devices {get; set;}
+        public class DeviceDTO
+        {
+            public string Code { get; set; }
+            public string CatCode { get; set; }
+            public string? Name { get; set; }
+            public bool State { get; set; } = true;
+            public Nullable<int> ShowIndex { get; set; }
+        }
+
         }
 
         [HttpGet("GetFull")]
