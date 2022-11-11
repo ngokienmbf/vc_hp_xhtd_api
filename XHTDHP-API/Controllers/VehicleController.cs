@@ -206,5 +206,17 @@ namespace XHTDHP_API.Controllers
             var pagedReponse = PaginationHelper.CreatePagedReponse<tblVehicle>(pagedData, filter, totalRecords);
             return Ok(pagedReponse);
         }
+
+        [HttpGet]
+        [Route("license-plate/{value}")]
+        public async Task<IActionResult> GetByLP(string value)
+        {
+            var found = await _context.tblVehicle.Where(item => item.Vehicle == value).FirstOrDefaultAsync();
+            if (found == null)
+            {
+                return BadRequest("Không tìm thấy phương tiện");
+            }
+            return Ok(found);
+        }
     }
 }
