@@ -40,17 +40,21 @@ namespace XHTDHP_API.Controllers
             var pagedData = await query.ToListAsync();
             var pagedReponse = PaginationHelper.CreatePagedReponse<tblVehicle>(pagedData, filter, totalRecords);
             
+            // lay driver duoc gan vao
             var driverVehicles = await _context.tblDriverVehicle.OrderBy(item => item.Vehicle).Where(item => item.Vehicle.Contains(filter.Keyword)).ToListAsync();
-            
             int tmp = 0;
             for (int i = 0; i < driverVehicles.Count(); i++)
             {
                 for (int j = tmp; j < pagedData.Count(); j++)
                 {
+                   
                     if (driverVehicles[i].Vehicle == pagedData[j].Vehicle)
                     {
-                        pagedData[j].UserName = driverVehicles[i].UserName;
-                        tmp = j+1; // tang hieu suat
+                        if(pagedData[j].Drivers == null){ 
+                            pagedData[j].Drivers = new List<string>();
+                        }
+                        pagedData[j].Drivers.Add(driverVehicles[i].UserName);
+                        tmp = j; // tang hieu suat
                         break;
                     }
                 }
@@ -69,8 +73,8 @@ namespace XHTDHP_API.Controllers
             return Ok(found);
         }
         
-        [HttpGet("GetFreeVehicles/{vehicle}")]
-        public IActionResult getFreeVehicles(string vehicle)
+        [HttpGet("GetFull")]
+        public IActionResult GetFull(string vehicle)
         {
             // var found =  _context.tblVehicle.Where( item => item.Vehicle ==  vehicle || 
             //            !_context.tblDriverVehicle.Any(f => f.Vehicle == item.Vehicle))
@@ -82,32 +86,37 @@ namespace XHTDHP_API.Controllers
         [HttpGet("GetWithDriver/{id}")]
         public async Task<IActionResult> GetWithVehicle(int id)
         {
-            var found = await (from p in _context.tblVehicle join o in _context.tblDriverVehicle
-            on p.Vehicle equals o.Vehicle into gj from subpet in gj.DefaultIfEmpty()
-            where p.IDVehicle == id
-            select new  
-            { 
-                 p.IDVehicle
-                ,p.Vehicle
-                ,p.Tonnage
-                ,p.TonnageDefault
-                ,p.NameDriver
-                ,p.IdCardNumber
-                ,p.HeightVehicle
-                ,p.WidthVehicle
-                ,p.LongVehicle
-                ,p.UnladenWeight1
-                ,p.UnladenWeight2
-                ,p.UnladenWeight3
-                ,p.IsSetMediumUnladenWeight
-                ,p.CreateDay
-                ,p.CreateBy
-                ,p.UpdateDay
-                ,p.UpdateBy,
-                 UserName = subpet.UserName ?? string.Empty
-            }).FirstOrDefaultAsync();     
+            // 1 - 1
+            // var found = await (from p in _context.tblVehicle join o in _context.tblDriverVehicle
+            // on p.Vehicle equals o.Vehicle into gj from subpet in gj.DefaultIfEmpty()
+            // where p.IDVehicle == id
+            // select new  
+            // { 
+            //      p.IDVehicle
+            //     ,p.Vehicle
+            //     ,p.Tonnage
+            //     ,p.TonnageDefault
+            //     ,p.NameDriver
+            //     ,p.IdCardNumber
+            //     ,p.HeightVehicle
+            //     ,p.WidthVehicle
+            //     ,p.LongVehicle
+            //     ,p.UnladenWeight1
+            //     ,p.UnladenWeight2
+            //     ,p.UnladenWeight3
+            //     ,p.IsSetMediumUnladenWeight
+            //     ,p.CreateDay
+            //     ,p.CreateBy
+            //     ,p.UpdateDay
+            //     ,p.UpdateBy,
+            //      UserName = subpet.UserName ?? string.Empty
+            // }).FirstOrDefaultAsync();     
 
-            return Ok(found);
+            var vehicle = await _context.tblVehicle.FindAsync(id);
+            var found = await _context.tblDriverVehicle.Where(item => item.Vehicle==vehicle.Vehicle)
+                .Select(item => item.UserName).ToListAsync();
+            vehicle.Drivers = found;
+            return Ok(vehicle);
         }
 
         [HttpPost]
@@ -125,43 +134,25 @@ namespace XHTDHP_API.Controllers
             model.UpdateDay = DateTime.Now;
             _context.Entry(model).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-            
-            if (!String.IsNullOrEmpty(model.UserName)) {
-                var found = await _context.tblDriverVehicle.Where(item => item.Vehicle == model.Vehicle).FirstOrDefaultAsync();
-                
-                if(found != null && found.UserName != model.UserName ){
-                    if(found.UserName != model.UserName)
-                    _context.Entry(found).State = EntityState.Deleted;
-                    _context.SaveChanges();
-                }
-                if(found == null || (found != null && found.UserName != model.UserName)) {
-                    var _driverVehicle = new tblDriverVehicle
-                    {
-                        UserName = model.UserName,
-                        Vehicle = model.Vehicle,
-                        CreateDay = DateTime.Now,
-                        UpdateDay= DateTime.Now,
-                        CreateBy = model.UpdateBy,
-                        UpdateBy = model.UpdateBy,
-                    };
-
-                    _context.tblDriverVehicle.Add(_driverVehicle);
-                    await _context.SaveChangesAsync();
-                }
-            }
-
             return Ok(new { succeeded = true, message = "Cập nhật thành công", data = model });
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var found = _context.tblVehicle.Find(id);
-            if (found != null)
+            var found1 = _context.tblVehicle.Find(id);
+            if (found1 != null)
             {
-                _context.Entry(found).State = EntityState.Deleted;
-                _context.SaveChanges();
-                return Ok(new { succeeded = true, message = "Xoá thành công" });
+                _context.Entry(found1).State = EntityState.Deleted;
+                //xoa bang trung gian
+                var found = await _context.tblDriverVehicle.Where(item => item.Vehicle == found1.Vehicle).ToListAsync();
+                
+                for (int i = 0; i < found.Count(); i++)
+                {
+                    _context.Entry(found[i]).State = EntityState.Deleted;
+                }
+                await _context.SaveChangesAsync();
+                return Ok(new { succeeded = true, message = "Xoá thành công", statusCode = 200 });
             }
             else
             {

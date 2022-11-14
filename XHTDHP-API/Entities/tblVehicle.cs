@@ -30,6 +30,6 @@ namespace XHTDHP_API.Entities
         public string UpdateBy { get; set; }
 
         [NotMapped]
-        public virtual String UserName {get; set;}
+        public List<String> Drivers {get; set;}
     }
 }

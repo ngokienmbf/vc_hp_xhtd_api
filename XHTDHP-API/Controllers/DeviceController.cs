@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,6 +22,7 @@ namespace XHTDHP_API.Controllers
     public class DeviceController : ControllerBase
     {
         private readonly ApiDbContext _context;
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public DeviceController(ApiDbContext context)
         {
@@ -78,6 +80,37 @@ namespace XHTDHP_API.Controllers
             _context.Entry(model).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return Ok(new { succeeded = true, message = "Cập nhật thành công", data = model });
+        }
+
+        [HttpPut("UpdateState")]
+        public  IActionResult UpdateState([FromBody] tblCategoriesDevices model)
+        {
+            var succeeded = true;
+            var message = "Cập nhật thành công";
+            var exception = "";
+            SqlConnection sqlCon = _context.Database.GetDbConnection() as SqlConnection;
+            try
+            {
+                sqlCon.Open();
+                SqlCommand Cmd = sqlCon.CreateCommand();
+                Cmd.CommandText = "update tblCategoriesDevices set State = @State Where Id = @Id";
+                Cmd.Parameters.Add("State", SqlDbType.Bit).Value = model.State;
+                Cmd.Parameters.Add("Id", SqlDbType.Int).Value = model.Id;
+                Cmd.ExecuteNonQuery();
+            }
+            catch (Exception Ex)
+            {
+                log.Info(Ex.Message);
+                exception = Ex.Message;
+                succeeded = false;
+                message = "Cập nhật không thành công";
+            }
+            finally
+            {
+                sqlCon.Close();
+                sqlCon.Dispose();
+            }
+            return Ok(new { succeeded = succeeded, message = message, data = model, exception =  exception});
         }
 
         [HttpDelete("{id}")]
