@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using XHTDHP_API.Data;
 using XHTDHP_API.Entities;
 using XHTDHP_API.Helpers;
+using XHTDHP_API.Models;
 using XHTDHP_API.Models.Filter;
 
 namespace XHTDHP_API.Controllers
@@ -77,6 +78,19 @@ namespace XHTDHP_API.Controllers
             {
                 return BadRequest(new { succeeded = false, message = "Có lỗi xảy ra" });
             }
+        }
+
+        [HttpPost]
+        [Route("assignVehicle")]
+        public async Task<IActionResult> AssignVehicle([FromBody] AssignVehicleDTO model )
+        {
+            tblRFID foundRfid = await _context.tblRFID.FindAsync(model.Id);
+            foundRfid.Vehicle = model.Vehicle;
+            await _context.SaveChangesAsync();
+            List<tblStoreOrderOperating> foundOrders = await _context.tblStoreOrderOperating.Where(o => o.Vehicle == model.Vehicle).ToListAsync();
+            foundOrders.ForEach(o => { o.CardNo = foundRfid.Code; });
+            await _context.SaveChangesAsync();
+            return Ok(new { succeeded = true, message = "Cập nhật thành công", data = foundRfid, statusCode = 200 });
         }
     }
 }
