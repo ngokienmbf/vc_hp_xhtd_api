@@ -31,7 +31,8 @@ namespace XHTDHP_API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] PaginationFilter filter)
         {
-            var query = _context.tblStoreOrderOperating.AsNoTracking();
+            var dayRequire = DateTime.Today.AddDays(-3);
+            var query = _context.tblStoreOrderOperating.Where(o => o.OrderDate >= dayRequire).OrderByDescending(item => item.OrderDate).AsNoTracking();
             if (!String.IsNullOrEmpty(filter.Keyword))
             {
                 query = query.Where(item => item.Vehicle.Contains(filter.Keyword));
@@ -40,9 +41,9 @@ namespace XHTDHP_API.Controllers
             {
                 query = query.Where(item => item.DeliveryCode.Contains(filter.DeliveryCode));
             }
-            if (!String.IsNullOrEmpty(filter.State))
+            if (!String.IsNullOrEmpty(filter.Step))
             {
-                query = query.Where(item => item.State.ToLower() == filter.State.ToLower());
+                query = query.Where(item => item.Step == Int32.Parse(filter.Step));
             }
 
             var totalRecords = await query.CountAsync();
@@ -106,9 +107,9 @@ namespace XHTDHP_API.Controllers
             {
                 query = query.Where(item => item.DeliveryCode.Contains(filter.DeliveryCode));
             }
-            if (!String.IsNullOrEmpty(filter.State))
+            if (!String.IsNullOrEmpty(filter.Step))
             {
-                query = query.Where(item => item.State.ToLower() == filter.State.ToLower());
+                query = query.Where(item => item.Step == Int32.Parse(filter.Step));
             }
 
             var totalRecords = await query.CountAsync();
