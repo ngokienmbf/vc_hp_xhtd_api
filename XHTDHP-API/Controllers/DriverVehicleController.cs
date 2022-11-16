@@ -49,16 +49,16 @@ namespace XHTDHP_API.Controllers
             return Ok(found);
         }
 
-        [HttpGet("GetByDriver/{driver}")]
-        public async Task<IActionResult> GetByDriver(string driver)
-        {
-            var found = await _context.tblDriverVehicle.Where(item => item.UserName == (driver)).ToListAsync();
-            return Ok(found);
-        }
-
         [HttpPost]
         public async Task<IActionResult> Insert([FromBody] tblDriverVehicle model)
         {
+            var found = await _context.tblDriverVehicle
+            .Where(item => item.Vehicle == model.Vehicle && item.UserName == model.UserName )
+            .FirstOrDefaultAsync();
+            if(found != null){
+                return Ok(new { succeeded = false, message = "Đã tồn tại", data = model, statusCode = 200 });
+            }
+
             model.CreateDay = DateTime.Now;
             _context.tblDriverVehicle.Add(model);
             await _context.SaveChangesAsync();
@@ -68,10 +68,18 @@ namespace XHTDHP_API.Controllers
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] tblDriverVehicle model)
         {
-            model.UpdateDay = DateTime.Now;
-            _context.Entry(model).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-            return Ok(new { succeeded = true, message = "Cập nhật thành công", data = model, statusCode = 200 });
+            var found = await _context.tblDriverVehicle
+            .Where(item => item.Vehicle == model.Vehicle && item.UserName == model.UserName && item.Id != model.Id)
+            .FirstOrDefaultAsync();
+            
+            if(found != null){
+                return Ok(new { succeeded = false, message = "Đã tồn tại", data = model, statusCode = 200 });
+            } else {
+                model.UpdateDay = DateTime.Now;
+                _context.Entry(model).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+                return Ok(new { succeeded = true, message = "Cập nhật thành công", data = model, statusCode = 200 });
+            }
         }
 
         [HttpDelete("{id}")]

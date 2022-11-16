@@ -21,5 +21,9 @@ namespace XHTDHP_API.Entities
         public string CreateBy { get; set; }
         public DateTime? UpdateDay { get; set; }
         public string UpdateBy { get; set; }
+
+        [NotMapped]
+        public List<tblCategoriesDevices> Devices {get; set;}
+        
     }
 }

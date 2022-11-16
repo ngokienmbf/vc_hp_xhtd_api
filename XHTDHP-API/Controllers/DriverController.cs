@@ -93,13 +93,20 @@ namespace XHTDHP_API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             var driver = _context.tblDriver.Find(id);
             if (driver != null)
             {
-                _context.Entry(driver).State = EntityState.Deleted;
-                _context.SaveChanges();
+                 _context.Entry(driver).State = EntityState.Deleted;
+                //xoa bang trung gian
+                var found = await _context.tblDriverVehicle.Where(item => item.UserName == driver.UserName).ToListAsync();
+                
+                for (int i = 0; i < found.Count(); i++)
+                {
+                    _context.Entry(found[i]).State = EntityState.Deleted;
+                }
+                await _context.SaveChangesAsync();
                 return Ok(new { succeeded = true, message = "Xoá thành công", statusCode = 200 });
             }
             else
