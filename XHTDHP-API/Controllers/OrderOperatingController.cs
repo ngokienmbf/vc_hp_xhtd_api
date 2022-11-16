@@ -260,5 +260,17 @@ namespace XHTDHP_API.Controllers
             stream.Position = 0;
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "bao-cao-don-hang.xlsx");
         }
+
+        [HttpGet]
+        [Route("getOrderByCode")]
+        public async Task<IActionResult> GetOrderByCode([FromQuery] string code) 
+        {
+            var found = await _context.tblStoreOrderOperating.Where(o => o.DeliveryCode == code).FirstOrDefaultAsync();
+            if (found == null)
+            {
+                return BadRequest(new {error = "Không tìm thấy order"});
+            }
+            return Ok(new {data = found, statusCode = 200});
+        }
     }
 }
