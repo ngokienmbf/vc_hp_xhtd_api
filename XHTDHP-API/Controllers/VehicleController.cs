@@ -207,7 +207,7 @@ namespace XHTDHP_API.Controllers
             {
                 return BadRequest("Không tìm thấy phương tiện");
             }
-            return Ok(found);
+            return Ok(new { data = found, statusCode = 200 });
         }
     }
 }

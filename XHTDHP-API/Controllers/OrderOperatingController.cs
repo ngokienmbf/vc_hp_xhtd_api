@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
+using XHTDHP_API.Bussiness;
 using XHTDHP_API.Data;
 using XHTDHP_API.Entities;
 using XHTDHP_API.Helpers;
@@ -96,24 +98,10 @@ namespace XHTDHP_API.Controllers
 
         [HttpGet]
         [Route("exportReport")]
-        public async Task<IActionResult> ExportToExcel([FromQuery] PaginationFilter filter)
+        public async Task<IActionResult> ExportToExcel([FromQuery] string typeReport)
         {
-            var query = _context.tblStoreOrderOperating.AsNoTracking();
-            if (!String.IsNullOrEmpty(filter.Keyword))
-            {
-                query = query.Where(item => item.Vehicle.Contains(filter.Keyword));
-            }
-            if (!String.IsNullOrEmpty(filter.DeliveryCode))
-            {
-                query = query.Where(item => item.DeliveryCode.Contains(filter.DeliveryCode));
-            }
-            if (!String.IsNullOrEmpty(filter.Step))
-            {
-                query = query.Where(item => item.Step == Int32.Parse(filter.Step));
-            }
-
-            var totalRecords = await query.CountAsync();
-            query = query.Skip((filter.Page - 1) * filter.PageSize).Take(filter.PageSize);
+            var dayRequire = DateTime.Today.AddDays(-3);
+            var query = _context.tblStoreOrderOperating.Where(o => o.OrderDate >= dayRequire).OrderByDescending(item => item.OrderDate).AsNoTracking();
             var listOrder = await query.ToListAsync();
             var stream = new MemoryStream();
             using (var xlPackage = new ExcelPackage(stream))
@@ -122,49 +110,143 @@ namespace XHTDHP_API.Controllers
                 var namedStyle = xlPackage.Workbook.Styles.CreateNamedStyle("HyperLink");
                 namedStyle.Style.Font.UnderLine = true;
                 namedStyle.Style.Font.Color.SetColor(Color.Blue);
-                const int startRow = 5;
+                const int startRow = 7;
                 var row = startRow;
 
-                //Create Headers and format them
-                worksheet.Cells["A1"].Value = "BÁO CÁO ĐƠN HÀNG";
-                using (var r = worksheet.Cells["A1:J1"])
+                switch (typeReport)
                 {
-                    r.Merge = true;
-                    r.Style.Font.Color.SetColor(Color.White);
-                    r.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.CenterContinuous;
-                    r.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                    r.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(23, 55, 93));
-                }
+                    case "door":
+                        //Create Headers and format them
+                        worksheet.Cells["A1"].Value = "CÔNG TY TNHH MTV XI MĂNG VICEM HẢI PHÒNG BỘ PHẬN BẢO VỆ";
+                        worksheet.Cells["A3"].Value = "BÁO CÁO TỔNG HỢP VÀO, RA CỔNG";
+                        worksheet.Cells["A4"].Value = "(Từ ngày ../../…. đến ngày ../../….)";
+                        worksheet.Cells["A3:G3"].Merge = true;
+                        worksheet.Cells["A4:G4"].Merge = true;
+                        using (var r = worksheet.Cells["A1:G1"])
+                        {
+                            r.Merge = true;
+                            r.Style.Font.Color.SetColor(Color.White);
+                            r.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.CenterContinuous;
+                            r.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                            r.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(23, 55, 93));
+                        }
+                        worksheet.Cells["A6"].Value = "Ngày đặt hàng";
+                        worksheet.Cells["B6"].Value = "MSGH";
+                        worksheet.Cells["C6"].Value = "Biến số xe";
+                        worksheet.Cells["D6"].Value = "Vào cổng";
+                        worksheet.Cells["E6"].Value = "Ra cổng";
+                        worksheet.Cells["F6"].Value = "NPP/Khách hàng";
+                        worksheet.Cells["G6"].Value = "Số lượng";
+                        worksheet.Cells["A6:G6"].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        worksheet.Cells["A6:G6"].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(184, 204, 228));
+                        worksheet.Cells["A6:G6"].Style.Font.Bold = true;
 
-                worksheet.Cells["A4"].Value = "Ngày đặt hàng";
-                worksheet.Cells["B4"].Value = "MSGH";
-                worksheet.Cells["C4"].Value = "Biến số xe";
-                worksheet.Cells["D4"].Value = "Mã RFID";
-                worksheet.Cells["E4"].Value = "Họ tên lái xe";
-                worksheet.Cells["F4"].Value = "Tên nhà phân phối";
-                worksheet.Cells["G4"].Value = "Hàng hóa";
-                worksheet.Cells["H4"].Value = "Khối lượng đặt";
-                worksheet.Cells["I4"].Value = "Số thứ tự lấy hàng";
-                worksheet.Cells["J4"].Value = "Trạng thái đơn hàng";
-                worksheet.Cells["A4:J4"].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                worksheet.Cells["A4:J4"].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(184, 204, 228));
-                worksheet.Cells["A4:J4"].Style.Font.Bold = true;
+                        row = 7;
+                        foreach (var order in listOrder)
+                        {
+                            worksheet.Cells[row, 1].Value = order.OrderDate;
+                            worksheet.Cells[row, 2].Value = order.DeliveryCode;
+                            worksheet.Cells[row, 3].Value = order.Vehicle;
+                            worksheet.Cells[row, 4].Value = order.TimeConfirm2;
+                            worksheet.Cells[row, 5].Value = order.TimeConfirm8;
+                            worksheet.Cells[row, 6].Value = order.NameDistributor;
+                            worksheet.Cells[row, 7].Value = order.SumNumber;
+                            row++;
+                        }
+                        break;
+                    case "listorder":
+                        //Create Headers and format them
+                        worksheet.Cells["A1"].Value = "CÔNG TY TNHH MTV XI MĂNG VICEM HẢI BỘ PHẬN ĐIỀU HÀNH";
+                        worksheet.Cells["A3"].Value = "BÁO CÁO TỔNG HỢP CẤP SỐ THỨ TỰ";
+                        worksheet.Cells["A4"].Value = "(Từ ngày ../../…. đến ngày ../../….)";
+                        worksheet.Cells["A3:I3"].Merge = true;
+                        worksheet.Cells["A4:I4"].Merge = true;
+                        using (var r = worksheet.Cells["A1:I1"])
+                        {
+                            r.Merge = true;
+                            r.Style.Font.Color.SetColor(Color.White);
+                            r.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.CenterContinuous;
+                            r.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                            r.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(23, 55, 93));
+                        }
+                        worksheet.Cells["A6"].Value = "Ngày đặt hàng";
+                        worksheet.Cells["B6"].Value = "MSGH";
+                        worksheet.Cells["C6"].Value = "Biến số xe";
+                        worksheet.Cells["D6"].Value = "Vào cổng";
+                        worksheet.Cells["E6"].Value = "Ra cổng";
+                        worksheet.Cells["F6"].Value = "NPP/Khách hàng";
+                        worksheet.Cells["G6"].Value = "Hàng hóa";
+                        worksheet.Cells["H6"].Value = "Số lượng";
+                        worksheet.Cells["I6"].Value = "Số thứ tự";
+                        worksheet.Cells["A6:I6"].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        worksheet.Cells["A6:I6"].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(184, 204, 228));
+                        worksheet.Cells["A6:I6"].Style.Font.Bold = true;
 
-                row = 5;
-                foreach (var order in listOrder)
-                {
-                    worksheet.Cells[row, 1].Value = order.OrderDate;
-                    worksheet.Cells[row, 2].Value = order.DeliveryCode;
-                    worksheet.Cells[row, 3].Value = order.Vehicle;
-                    worksheet.Cells[row, 4].Value = order.CardNo;
-                    worksheet.Cells[row, 5].Value = order.DriverName;
-                    worksheet.Cells[row, 6].Value = order.NameDistributor;
-                    worksheet.Cells[row, 7].Value = order.NameProduct;
-                    worksheet.Cells[row, 8].Value = order.SumNumber;
-                    worksheet.Cells[row, 9].Value = order.IndexOrder;
-                    worksheet.Cells[row, 10].Value = order.State;
+                        row = 7;
+                        foreach (var order in listOrder)
+                        {
+                            worksheet.Cells[row, 1].Value = order.OrderDate;
+                            worksheet.Cells[row, 2].Value = order.DeliveryCode;
+                            worksheet.Cells[row, 3].Value = order.Vehicle;
+                            worksheet.Cells[row, 4].Value = order.TimeConfirm2;
+                            worksheet.Cells[row, 5].Value = order.TimeConfirm8;
+                            worksheet.Cells[row, 6].Value = order.NameDistributor;
+                            worksheet.Cells[row, 7].Value = order.NameProduct;
+                            worksheet.Cells[row, 8].Value = order.SumNumber;
+                            worksheet.Cells[row, 8].Value = order.IndexOrder;
+                            row++;
+                        }
+                        break;
+                    case "weightStation":
+                        //Create Headers and format them
+                        worksheet.Cells["A1"].Value = "CÔNG TY TNHH MTV XI MĂNG VICEM HẢI PHÒNG";
+                        worksheet.Cells["A2"].Value = "TRẠM CÂN 951";
+                        worksheet.Cells["A3"].Value = "BÁO CÁO TỔNG HỢP CÂN HÀNG";
+                        worksheet.Cells["A4"].Value = "(Từ ngày ../../…. đến ngày ../../….)";
+                        worksheet.Cells["A3:K3"].Merge = true;
+                        worksheet.Cells["A4:K4"].Merge = true;
+                        using (var r = worksheet.Cells["A1:K1"])
+                        {
+                            r.Merge = true;
+                            r.Style.Font.Color.SetColor(Color.White);
+                            r.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.CenterContinuous;
+                            r.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                            r.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(23, 55, 93));
+                        }
+                        worksheet.Cells["A6"].Value = "Ngày đặt hàng";
+                        worksheet.Cells["B6"].Value = "MSGH";
+                        worksheet.Cells["C6"].Value = "Biến số xe";
+                        worksheet.Cells["D6"].Value = "Vào cổng";
+                        worksheet.Cells["E6"].Value = "Ra cổng";
+                        worksheet.Cells["F6"].Value = "NPP/Khách hàng";
+                        worksheet.Cells["G6"].Value = "Hàng hóa";
+                        worksheet.Cells["H6"].Value = "Số lượng";
+                        worksheet.Cells["I6"].Value = "KL bì";
+                        worksheet.Cells["J6"].Value = "KL tổng";
+                        worksheet.Cells["K6"].Value = "KL hàng";
+                        worksheet.Cells["A6:K6"].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        worksheet.Cells["A6:K6"].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(184, 204, 228));
+                        worksheet.Cells["A6:K6"].Style.Font.Bold = true;
 
-                    row++;
+                        row = 7;
+                        foreach (var order in listOrder)
+                        {
+                            worksheet.Cells[row, 1].Value = order.OrderDate;
+                            worksheet.Cells[row, 2].Value = order.DeliveryCode;
+                            worksheet.Cells[row, 3].Value = order.Vehicle;
+                            worksheet.Cells[row, 4].Value = order.TimeConfirm2;
+                            worksheet.Cells[row, 5].Value = order.TimeConfirm8;
+                            worksheet.Cells[row, 6].Value = order.NameDistributor;
+                            worksheet.Cells[row, 7].Value = order.NameProduct;
+                            worksheet.Cells[row, 8].Value = order.SumNumber;
+                            worksheet.Cells[row, 9].Value = order.SumNumber;
+                            worksheet.Cells[row, 10].Value = order.SumNumber;
+                            worksheet.Cells[row, 11].Value = order.SumNumber;
+                            row++;
+                        }
+                        break;
+                    default:
+                        break;
                 }
 
                 // set some core property values
@@ -177,6 +259,18 @@ namespace XHTDHP_API.Controllers
             }
             stream.Position = 0;
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "bao-cao-don-hang.xlsx");
+        }
+
+        [HttpGet]
+        [Route("getOrderByCode")]
+        public async Task<IActionResult> GetOrderByCode([FromQuery] string code) 
+        {
+            var found = await _context.tblStoreOrderOperating.Where(o => o.DeliveryCode == code).FirstOrDefaultAsync();
+            if (found == null)
+            {
+                return BadRequest(new {error = "Không tìm thấy order"});
+            }
+            return Ok(new {data = found, statusCode = 200});
         }
     }
 }
