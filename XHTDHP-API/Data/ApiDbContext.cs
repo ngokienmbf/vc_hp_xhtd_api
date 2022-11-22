@@ -25,5 +25,7 @@ namespace XHTDHP_API.Data
         public DbSet<tblTrough> tblTrough { get; set; }
         public DbSet<tblTroughTypeProduct> tblTroughTypeProduct { get; set; }
         public DbSet<tblSystemParameter> tblSystemParameter { get; set; }
+        public DbSet<tblAccountGroup> tblAccountGroup { get; set; }
+        public DbSet<tblAccountGroupFunction> tblAccountGroupFunction { get; set; }
     }
 }

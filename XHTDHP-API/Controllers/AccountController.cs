@@ -23,10 +23,12 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using XHTDHP_API.Models.Filter;
+using XHTDHP_API.Helpers;
 
 namespace XHTDHP_API.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/[controller]")]
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = false)]
     public class AccountController : ControllerBase
@@ -145,5 +147,53 @@ namespace XHTDHP_API.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll([FromQuery] PaginationFilter filter)
+        {
+            var query = _context.tblAccount.OrderBy(item => item.UserName).AsNoTracking();
+            if (!String.IsNullOrEmpty(filter.Keyword))
+            {
+                query = query.Where(item => item.FullName.Contains(filter.Keyword) || item.UserName.Contains(filter.Keyword));
+            }
+            var totalRecords = await query.CountAsync();
+            query = query.Skip((filter.Page - 1) * filter.PageSize).Take(filter.PageSize);
+            var pagedData = await query.ToListAsync();
+            var pagedReponse = PaginationHelper.CreatePagedReponse<tblAccount>(pagedData, filter, totalRecords);
+            return Ok(pagedReponse);
+        }
+        
+        [HttpGet("GetFull")]
+        public async Task<IActionResult> GetFull()
+        {
+            var query = await _context.tblAccount.OrderBy(item => item.UserName).ToListAsync();
+            return Ok(query);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetByID(int id)
+        {
+            var found = await _context.tblAccount.FindAsync(id);
+            return Ok(found);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> Update([FromBody] tblAccount model)
+        {
+            model.UpdateDay = DateTime.Now;
+            
+            if (!String.IsNullOrEmpty(model.Password))
+            {
+                model.Password = objFunction.CryptographyMD5(model.Password);
+                _context.Entry(model).State = EntityState.Modified;
+            }else {
+                _context.Entry(model).State = EntityState.Modified;
+                _context.Entry(model).Property(x => x.Password).IsModified = false;
+            }
+            await _context.SaveChangesAsync();
+            model.Password = "";
+            return Ok(new { succeeded = true, message = "Cập nhật thành công", data = model, statusCode = 200 });
+        }
+    
     }
 }
