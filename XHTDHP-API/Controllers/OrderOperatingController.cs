@@ -120,8 +120,7 @@ namespace XHTDHP_API.Controllers
                         worksheet.Cells["A1"].Value = "CÔNG TY TNHH MTV XI MĂNG VICEM HẢI PHÒNG BỘ PHẬN BẢO VỆ";
                         worksheet.Cells["A3"].Value = "BÁO CÁO TỔNG HỢP VÀO, RA CỔNG";
                         worksheet.Cells["A4"].Value = "(Từ ngày ../../…. đến ngày ../../….)";
-                        worksheet.Cells["A3:G3"].Merge = true;
-                        worksheet.Cells["A4:G4"].Merge = true;
+
                         using (var r = worksheet.Cells["A1:G1"])
                         {
                             r.Merge = true;
@@ -129,6 +128,16 @@ namespace XHTDHP_API.Controllers
                             r.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.CenterContinuous;
                             r.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
                             r.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(23, 55, 93));
+                        }
+                        using (var r = worksheet.Cells["A3:G3"])
+                        {
+                            r.Merge = true;
+                            r.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.CenterContinuous;
+                        }
+                        using (var r = worksheet.Cells["A4:G4"])
+                        {
+                            r.Merge = true;
+                            r.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.CenterContinuous;
                         }
                         worksheet.Cells["A6"].Value = "Ngày đặt hàng";
                         worksheet.Cells["B6"].Value = "MSGH";
@@ -168,6 +177,16 @@ namespace XHTDHP_API.Controllers
                             r.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.CenterContinuous;
                             r.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
                             r.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(23, 55, 93));
+                        }
+                        using (var r = worksheet.Cells["A3:I3"])
+                        {
+                            r.Merge = true;
+                            r.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.CenterContinuous;
+                        }
+                        using (var r = worksheet.Cells["A4:I4"])
+                        {
+                            r.Merge = true;
+                            r.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.CenterContinuous;
                         }
                         worksheet.Cells["A6"].Value = "Ngày đặt hàng";
                         worksheet.Cells["B6"].Value = "MSGH";
@@ -212,6 +231,16 @@ namespace XHTDHP_API.Controllers
                             r.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.CenterContinuous;
                             r.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
                             r.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(23, 55, 93));
+                        }
+                        using (var r = worksheet.Cells["A3:K3"])
+                        {
+                            r.Merge = true;
+                            r.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.CenterContinuous;
+                        }
+                        using (var r = worksheet.Cells["A4:K4"])
+                        {
+                            r.Merge = true;
+                            r.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.CenterContinuous;
                         }
                         worksheet.Cells["A6"].Value = "Ngày đặt hàng";
                         worksheet.Cells["B6"].Value = "MSGH";
