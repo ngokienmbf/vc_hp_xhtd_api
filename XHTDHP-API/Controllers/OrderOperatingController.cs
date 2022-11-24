@@ -34,7 +34,7 @@ namespace XHTDHP_API.Controllers
         public async Task<IActionResult> GetAll([FromQuery] PaginationFilter filter)
         {
             var dayRequire = DateTime.Today.AddDays(-3);
-            var query = _context.tblStoreOrderOperating.Where(o => o.OrderDate >= dayRequire).OrderByDescending(item => item.OrderDate).AsNoTracking();
+            var query = _context.tblStoreOrderOperating.OrderByDescending(item => item.IndexOrder).AsNoTracking();
             if (!String.IsNullOrEmpty(filter.Keyword))
             {
                 query = query.Where(item => item.Vehicle.Contains(filter.Keyword));
