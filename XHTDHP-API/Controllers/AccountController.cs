@@ -28,9 +28,8 @@ using XHTDHP_API.Helpers;
 
 namespace XHTDHP_API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
-    [ApiExplorerSettings(IgnoreApi = false)]
+    [Route("api/[controller]")]
     public class AccountController : ControllerBase
     {
         private readonly ILoggerManager _logger;
@@ -94,7 +93,6 @@ namespace XHTDHP_API.Controllers
         }
 
         [HttpPost]
-        [Route("/register")]
         public async Task<IActionResult> Register([FromBody] RegisterDTO model)
         {
             if (String.IsNullOrEmpty(model.UserName))
