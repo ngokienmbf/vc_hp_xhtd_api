@@ -97,5 +97,20 @@ namespace XHTDHP_API.Controllers
                 return BadRequest(new { succeeded = false, message = "Có lỗi xảy ra" });
             }
         }
+
+        [HttpGet("getDriverByVehicle/{vehicle}")]
+        public async Task<IActionResult> GetDriverByVehicle(string vehicle, [FromQuery] PaginationFilter filter)
+        {
+            var query = _context.tblDriverVehicle.Where(dv => dv.Vehicle == vehicle).OrderBy(item => item.Id).AsNoTracking();
+            if (!String.IsNullOrEmpty(filter.Keyword))
+            {
+                query = query.Where(item => item.Vehicle.Contains(filter.Keyword) || item.UserName.Contains(filter.Keyword));
+            }
+            var totalRecords = await query.CountAsync();
+            query = query.Skip((filter.Page - 1) * filter.PageSize).Take(filter.PageSize);
+            var pagedData = await query.ToListAsync();
+            var pagedReponse = PaginationHelper.CreatePagedReponse<tblDriverVehicle>(pagedData, filter, totalRecords);
+            return Ok(pagedReponse);
+        }
     }
 }
