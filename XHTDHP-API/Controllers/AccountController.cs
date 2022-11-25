@@ -48,7 +48,7 @@ namespace XHTDHP_API.Controllers
         //}
 
         [ApiExplorerSettings(IgnoreApi = true)]
-        [HttpPost]
+        [HttpPost("login")]
         public async Task<ActionResult<Object>> Login([FromBody] LoginDto model)
         {
             var responseModel = new SumProfileResponseDTO();
@@ -92,7 +92,7 @@ namespace XHTDHP_API.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDTO model)
         {
             if (String.IsNullOrEmpty(model.UserName))
