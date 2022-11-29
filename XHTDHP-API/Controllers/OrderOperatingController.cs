@@ -301,5 +301,40 @@ namespace XHTDHP_API.Controllers
             }
             return Ok(new {data = found, statusCode = 200});
         }
+
+        [HttpGet]
+        [Route("getOrderByRfid/{rfid}")]
+        public async Task<IActionResult> GetOrderByRfid(string rfid)
+        {
+            var founds = await _context.tblStoreOrderOperating.Where(o => o.CardNo == rfid && o.Step == 1).ToListAsync();
+            if (founds.Any(f => f == null)) 
+            {
+                return BadRequest(new { error = "Không tìm thấy order nào" });
+            }
+            return Ok(new { data = founds, statusCode = 200 });
+        }
+
+        [HttpGet]
+        [Route("getOrderEnterExit")]
+        public async Task<IActionResult> getOrderEnterExit([FromQuery] PaginationFilter filter)
+        {
+            var dayRequire = DateTime.Today.AddDays(-3);
+            var query = _context.tblStoreOrderOperating.Where(o => o.OrderDate >= dayRequire && o.Step <= 6)
+                .OrderByDescending(item => item.OrderDate).AsNoTracking();
+            if (!String.IsNullOrEmpty(filter.Keyword))
+            {
+                query = query.Where(item => item.Vehicle.Contains(filter.Keyword));
+            }
+            if (!String.IsNullOrEmpty(filter.DeliveryCode))
+            {
+                query = query.Where(item => item.DeliveryCode.Contains(filter.DeliveryCode));
+            }
+
+            var totalRecords = await query.CountAsync();
+            query = query.Skip((filter.Page - 1) * filter.PageSize).Take(filter.PageSize);
+            var pagedData = await query.ToListAsync();
+            var pagedReponse = PaginationHelper.CreatePagedReponse<tblStoreOrderOperating>(pagedData, filter, totalRecords);
+            return Ok(pagedReponse);
+        }
     }
 }
