@@ -306,7 +306,7 @@ namespace XHTDHP_API.Controllers
         [Route("getOrderByRfid/{rfid}")]
         public async Task<IActionResult> GetOrderByRfid(string rfid)
         {
-            var founds = await _context.tblStoreOrderOperating.Where(o => o.CardNo == rfid && o.Step == 1).ToListAsync();
+            var founds = await _context.tblStoreOrderOperating.Where(o => o.CardNo == rfid && (o.Step == 2 || o.Step == 1)).ToListAsync();
             if (founds.Any(f => f == null)) 
             {
                 return BadRequest(new { error = "Không tìm thấy order nào" });
