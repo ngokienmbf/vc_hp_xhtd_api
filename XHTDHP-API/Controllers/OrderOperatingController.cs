@@ -308,12 +308,21 @@ namespace XHTDHP_API.Controllers
         {
             var founds = await _context.tblStoreOrderOperating.Where(o => o.CardNo == rfid && (o.Step == 2 || o.Step == 1))
                 .ToListAsync();
-            var foudVehicle = await _context.tblRFID.Where(r => r.Code == rfid).FirstOrDefaultAsync();
-            if (founds.Any(f => f == null) && foudVehicle == null) 
+            var query = from v in _context.tblDriverVehicle
+                        join r in _context.tblRFID on v.Vehicle equals r.Vehicle into verf
+                        from t in verf.DefaultIfEmpty()
+                        where t.Code == rfid
+                        select new 
+                        {
+                            Vehicle = v.Vehicle,
+                            UserName= v.UserName
+                        };
+            var foundVehicle = query.FirstOrDefaultAsync();
+            if (founds.Any(f => f == null) && foundVehicle == null) 
             {
                 return BadRequest(new { error = "Không tìm thấy dữ liệu" });
             }
-            return Ok(new { data = founds, vehicle = foudVehicle.Vehicle, statusCode = 200 });
+            return Ok(new { data = founds, driverVehicle = foundVehicle.Result, statusCode = 200 });
         }
 
         [HttpGet]
