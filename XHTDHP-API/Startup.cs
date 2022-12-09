@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using XHTDHP_API.Data;
+using XHTDHP_API.Hubs;
 
 namespace XHTDHP_API
 {
@@ -31,6 +33,8 @@ namespace XHTDHP_API
             services.AddControllers();
             services.AddDbContext<ApiDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("SQLConnOracle")));
             services.AddSwaggerGen();
+
+            services.AddSignalR();
 
             services.AddCors(options =>
             {
@@ -75,6 +79,11 @@ namespace XHTDHP_API
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+
+                endpoints.MapHub<ScaleHub>("/scaleHub", options =>
+                {
+                    options.Transports = HttpTransportType.WebSockets;
+                });
             });
 
             app.Run(async(context) => {
