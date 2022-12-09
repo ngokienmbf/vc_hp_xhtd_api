@@ -80,5 +80,12 @@ namespace XHTDHP_API.Controllers
             }
         }
 
+        [HttpGet("GetFullFunctions")]
+        public async Task<IActionResult> GetFullFunctions()
+        {
+            var query = await _context.tblFunction.OrderBy(item => item.ItemIndex).ToListAsync();
+            return Ok(query);
+        }
+
     }
 }
