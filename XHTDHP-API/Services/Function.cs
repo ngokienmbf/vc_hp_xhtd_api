@@ -12,7 +12,7 @@ using System.Data;
 using System.Data.OracleClient;
 using System.Net;
 
-namespace XHTDHP_API.Bussiness
+namespace XHTDHP_API.Services
 {
     public class Function
     {

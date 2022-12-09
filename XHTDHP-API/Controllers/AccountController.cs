@@ -9,7 +9,7 @@ using System.Data;
 using Newtonsoft.Json;
 using Nest;
 using System.Threading.Tasks;
-using XHTDHP_API.Bussiness;
+using XHTDHP_API.Services;
 using Microsoft.Extensions.Configuration;
 using System;
 using XHTDHP_API.Auth;
@@ -25,6 +25,7 @@ using System.Security.Cryptography;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using XHTDHP_API.Models.Filter;
 using XHTDHP_API.Helpers;
+using XHTDHP_API.Utils;
 
 namespace XHTDHP_API.Controllers
 {
@@ -40,6 +41,8 @@ namespace XHTDHP_API.Controllers
             _context = context;
         }
         Function objFunction = new Function();
+        IEmailSender _emailSender = new AuthMessageSender();
+  
         //public AccountController(IConfiguration configuration, ILoggerManager logger)
         //{
         //    _configuration = configuration;
@@ -54,37 +57,48 @@ namespace XHTDHP_API.Controllers
             var responseModel = new SumProfileResponseDTO();
             responseModel.ListRole = new List<string>();
             
-            //TODO: remove sau khi done phần qly tài khoản
-            responseModel.ListRole.Add("Admin");
-            responseModel.ListRole.Add("ds");
-            
             if (String.IsNullOrEmpty(model.userName) || String.IsNullOrEmpty(model.password))
             {
+                responseModel.Message = "Không được để trống tài khoản và mật khẩu";
                 return responseModel;
             }
             else
             {
                 var checkUserNameAndPass = objFunction.checkUserNameAndPassWord(model.userName, model.password);
-                var account = _context.tblAccount.FirstOrDefault(u => u.UserName == model.userName);
-                if (!checkUserNameAndPass) return responseModel;
                 
-                var user = new AppUser
+                if (!checkUserNameAndPass) 
                 {
-                    UserName = model.userName,
-                    NormalizedUserName = model.userName,
-                    PasswordHash = model.password
-                };
+                    responseModel.Message = "Sai tài khoản hoặc mật khẩu";
+                    return responseModel;
+                }
+                
+                var account = _context.tblAccount.FirstOrDefault(u => u.UserName == model.userName);
+                if (account != null)
+                {
+                    var user = new AppUser
+                    {
+                        UserName = account.UserName,
+                        NormalizedUserName = account.UserName,
+                        PasswordHash = account.Password,
+                    };
 
-                if (user != null)
-                {
                     // var lstRole = await _userManager.GetRolesAsync(user);
                     // responseModel.ListRole = _mapper.Map<List<string>>(lstRole);
+                    
+                    //responseModel.ListRole.Add("Admin");
+                   
+                    responseModel.ListRole.Add(account.GroupId.ToString());
+                    responseModel.GroupId = account.GroupId;
+                    responseModel.GroupFunctions = await _context.tblAccountGroupFunction.Where(item => item.GroupId == account.GroupId)
+                    .ToListAsync();
+
+                    
                     var jwt = await GenerateJwtToken(user);
                     var expireIn = Convert.ToDouble(3600);
                     responseModel.expires_in = expireIn;
                     responseModel.access_token = jwt.ToString();
                     responseModel.token_type = "bearer";
-                    responseModel.errorCode = "200";
+                    responseModel.ErrorCode = "200";
                     return responseModel;
                 } else {
                     return responseModel;
@@ -192,6 +206,137 @@ namespace XHTDHP_API.Controllers
             model.Password = "";
             return Ok(new { succeeded = true, message = "Cập nhật thành công", data = model, statusCode = 200 });
         }
+
+        [HttpPut("ResetPassword")]
+        public async Task<IActionResult> ResetPassword([FromBody] int id)
+        {
+            var found = await _context.tblAccount.Where(item => item.Id == id).FirstOrDefaultAsync();
+            if (found != null)
+            {
+                found.Password = objFunction.CryptographyMD5(found.Password);
+                _context.Entry(found).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+                return Ok(new { succeeded = true, message = "Khôi phục mật khẩu mặc định thành công" });
+            }
+            else
+            {
+                return BadRequest(new { succeeded = false, message = "Có lỗi xảy ra" });
+            }
+        }
+
+
+        // --- forgot, verify, set new password
+
+        //[HttpPost("ForgotPassword")]
+        private async Task<ActionResult<Object>> ForgotPassword([FromBody] ForgotPassworDTO model)
+        {
+            var responseModel = new ForgotPassworResponseDTO();
+            responseModel.EmailOrPhone = model.EmailOrPhone;
+
+            //var user = await _context.FindByEmailAsync(model.EmailOrPhone);
+            var user = _context.tblAccount.FirstOrDefault(u => u.Email.ToLower() == model.EmailOrPhone.ToLower());
+            if (user == null)
+            {
+                responseModel.ErrorCode = "ACC008";
+                responseModel.Message = ConstMessage.GetMsgConst("ACC008");
+                return responseModel;
+            }
+            var codeMail = objFunction.CryptographyMD5(model.EmailOrPhone.ToLower()+DateTime.Now.ToShortDateString().ToString());
+            await SendCode("Email", model.EmailOrPhone, codeMail);
+            responseModel.ErrorCode = "00";
+            responseModel.Message = "Đã gửi code xác nhận qua email";
+            return responseModel;
+        }
+
+        /// <remarks>
+        /// Xác thực mã code sau khi nhận được từ email
+        /// </remarks>
+        /// <returns></returns>
+        //[HttpPost("VerifyCode")]
+        private async Task<ActionResult<Object>> VerifyCode(VerifyCodeDTO model)
+        {
+            var responseModel = new ConfirmVerify();
+            responseModel.EmailOrPhone = model.email;
+            responseModel.Code = model.code;
+            var user = _context.tblAccount.FirstOrDefault(u => u.Email.ToLower() == model.email.ToLower());
+            if (user == null)
+            {
+                responseModel.ErrorCode = "ACC008";
+                responseModel.Message = ConstMessage.GetMsgConst("ACC008");
+                return responseModel;
+            }
+
+            var codeMail = objFunction.CryptographyMD5(model.email.ToLower()+DateTime.Now.ToShortDateString().ToString());
+            var result =  model.code == codeMail;
+            if (result)
+            {
+                responseModel.Code = "00";
+                responseModel.Message = "Verify Thành công";
+                return responseModel;
+            }
+            else
+            {
+                responseModel.ErrorCode = "ACC012";
+                responseModel.Message = "Verify không thành công";
+                return responseModel;
+            }
+        }
+
+
+        /// <remarks>
+        /// Hàm gửi lại mã code vào email, dành cho trường hợp cần gửi lại
+        /// </remarks>
+        /// <returns></returns>
+        //[HttpPost("ResendCode")]
+        private async Task<ActionResult<Object>> ResendCode([FromBody] ForgotPassworDTO model)
+        {
+            var responseModel = new ModelBase();
+            var code = "";
+            var user = _context.tblAccount.FirstOrDefault(u => u.Email.ToLower() == model.EmailOrPhone.ToLower());
+
+            if (Util.IsPhoneNumber(model.EmailOrPhone))
+            {
+                responseModel.ErrorCode = "01";
+                responseModel.Message = "Hệ thống chưa hỗ trợ số điện thoại, vui lòng sử dụng email để thử lại";
+                return responseModel;
+            }
+                if (user == null)
+            {
+                responseModel.ErrorCode = "ACC008";
+                responseModel.Message = ConstMessage.GetMsgConst("ACC008");
+                return responseModel;
+            }
+            if (!Util.IsPhoneNumber(model.EmailOrPhone))
+            {
+                code = objFunction.CryptographyMD5(model.EmailOrPhone.ToLower()+DateTime.Now.ToShortDateString().ToString());
+            }
+            else
+            {
+                code = objFunction.CryptographyMD5(model.EmailOrPhone.ToLower()+DateTime.Now.ToShortDateString().ToString());
+            }
+
+
+            await SendCode(Util.IsPhoneNumber(model.EmailOrPhone) ? "Phone" : "Email", model.EmailOrPhone, code);
+            responseModel.ErrorCode = "00";
+            responseModel.Message = "Đã gửi code xác nhận";
+            return responseModel;
+        }
+
+        private async Task<ActionResult<Object>> SendCode(string provider, string emailOrPhone, string code)
+        {
+            await _emailSender.SendEmailAsync(emailOrPhone, "Mã xác thực lấy lại mật khẩu", $"Mã xác thực của bạn là:{code}", new EmailConfig());
+            //if (provider == "Email")
+            //{
+            //    await _emailSender.SendEmailAsync(emailOrPhone, "Mã xác thực lấy lại mật khẩu", $"Mã xác thực của bạn là:{code}", _repositoryWrapper.AspNetUsers.setting());
+            //}
+            //else if (provider == "Phone")
+            //{
+            //    Util.SendSMS($"Ma code xac thuc cua ban la: {code}", emailOrPhone);
+            //}
+
+            return NoContent();
+        }
     
     }
+    
 }
