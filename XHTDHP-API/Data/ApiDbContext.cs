@@ -27,5 +27,6 @@ namespace XHTDHP_API.Data
         public DbSet<tblSystemParameter> tblSystemParameter { get; set; }
         public DbSet<tblAccountGroup> tblAccountGroup { get; set; }
         public DbSet<tblAccountGroupFunction> tblAccountGroupFunction { get; set; }
+        public DbSet<tblFunction> tblFunction { get; set; }
     }
 }
