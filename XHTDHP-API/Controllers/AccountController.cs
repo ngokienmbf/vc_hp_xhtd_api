@@ -57,6 +57,7 @@ namespace XHTDHP_API.Controllers
             //TODO: remove sau khi done phần qly tài khoản
             responseModel.ListRole.Add("Admin");
             responseModel.ListRole.Add("ds");
+            responseModel.ListRole.Add("2");
             
             if (String.IsNullOrEmpty(model.userName) || String.IsNullOrEmpty(model.password))
             {
